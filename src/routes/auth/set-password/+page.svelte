@@ -1,3 +1,7 @@
+<script>
+  import AuthUi from "$lib/components/AuthUI.svelte";
+</script>
+<AuthUi>
 <h1>Update password</h1>
 
 <form method="POST" action="?/updatePassword">
@@ -11,3 +15,4 @@
     </label>
     <button>Update password</button>
   </form>
+  </AuthUi>
