@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from "svelte";
+    let {children} = $props();
 
     let cnv!: HTMLCanvasElement;
     let ctx!: CanvasRenderingContext2D;
@@ -46,7 +47,7 @@ on:pointermove={(e) => {
     <canvas bind:this={cnv}></canvas>
 </div>
 <div class="auth-form-container">
-    <slot></slot>
+    {@render children()}
 </div>
 
 <style>

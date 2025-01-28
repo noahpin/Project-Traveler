@@ -1,6 +1,6 @@
 <script>
 	let { data } = $props();
-	let { countries } = $derived(data);
+	let { page } = $derived(data);
 </script>
 
 <h1>Welcome to Supabase!</h1>
@@ -8,7 +8,7 @@
     {JSON.stringify(data.error)}
 {/if}
 <ul>
-	{#each countries as country}
-		<li>{country.name}</li>
-	{/each}
+	{JSON.stringify(page)}
 </ul>
+
+<a href="/asdf">asdf</a>
