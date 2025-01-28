@@ -1,2 +1,14 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<script>
+	let { data } = $props();
+	let { countries } = $derived(data);
+</script>
+
+<h1>Welcome to Supabase!</h1>
+{#if data.error}
+    {JSON.stringify(data.error)}
+{/if}
+<ul>
+	{#each countries as country}
+		<li>{country.name}</li>
+	{/each}
+</ul>

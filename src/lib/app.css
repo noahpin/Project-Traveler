@@ -1,0 +1,83 @@
+@import url('https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Geist:wght@100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap');
+body,
+html {
+    padding: 0;
+    margin: 0;
+    width: 100vw;
+    height: 100%;
+    background: white;
+    font-family: 'Geist', sans-serif;
+    overflow-x: hidden;
+}
+
+.ejs-layout-block {
+    width: 100%;
+    padding: 8px 0;
+    border-radius: 16px;
+    background: #eaeaea;
+    min-height: 40px;
+    box-sizing: border-box;
+    display: flex;
+    gap: 4px;
+}
+.ejs-layout-editor-child {
+    background: white;
+    border-radius: 8px;
+    min-height: unset;
+    padding: 4px 8px;
+    box-sizing: border-box;
+    width: 100%;
+}
+.ejs-layout-editor-child .codex-editor__redactor {
+    padding-bottom: 100px !important;
+}
+.ejs-layout-divider-child {
+    background: rgb(160, 160, 160);
+    width: 4px;
+    flex-shrink: 0;
+    border-radius: 4px;
+    margin: 0 8px;
+}
+.ejs-layout-handle {
+    background: rgb(90, 124, 151);
+    width: 4px;
+    flex-shrink: 0;
+    margin: 15px 0;
+    border-radius: 4px;
+    position: relative;
+    cursor: grab;
+}
+
+.ejs-layout-handle:first-of-type {
+    background: transparent !important;
+}
+.ejs-layout-handle:last-of-type {
+    background: transparent !important;
+}
+.ejs-layout-handle-button {
+    position: absolute;
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: white;
+    border: 1px solid rgb(196, 196, 196);
+    box-sizing: border-box;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    cursor: pointer;
+}
+.ejs-layout-handle:hover .ejs-layout-handle-button, .ejs-layout-handle-button:hover {
+    opacity: 1;
+    pointer-events: all;
+}
+.ejs-layout-handle-button i {
+    font-style: normal !important;
+    font-size: 20px;
+}
+
