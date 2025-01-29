@@ -116,3 +116,21 @@ html {
 
 
 
+.traveler-page-root {
+    width: 100%;
+}
+.traveler-flex {
+    align-items:start;
+    display: flex;
+    align-items: flex-start;
+    align-content: flex-start;
+    flex-wrap: wrap;
+}
+.traveler-image {
+    width: 100%;
+    object-fit: cover;
+}
+.traveler-image img {
+    width: 100%;
+    height: 100%;
+}

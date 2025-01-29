@@ -1,4 +1,6 @@
 <script lang="ts">
     let {blockData}: {blockData: {url: string}} = $props();
 </script>
-<img src={blockData.url} />
+<div class="traveler-image">
+    <img src={blockData.url} />
+</div>

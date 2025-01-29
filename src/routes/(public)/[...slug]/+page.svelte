@@ -8,7 +8,4 @@
 {#if data.error}
     {JSON.stringify(data.error)}
 {/if}
-<PageRenderer content={data.page.content.content}></PageRenderer>
-<br>
-
-<a href="/asdf">asdf</a>
+<PageRenderer content={data.page.content}></PageRenderer>
