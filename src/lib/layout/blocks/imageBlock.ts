@@ -1,4 +1,4 @@
-import { Block, Lithograph } from "../lithograph";
+import { Block, Lithograph, type BlockSaveData } from "../lithograph";
 
 export class ImageBlock extends Block {
 	image: string = "https://placecats.com/300/200";
@@ -24,4 +24,13 @@ export class ImageBlock extends Block {
     render() {
 		return `<div class="lpv-image"><img src="${this.image}" /></div>`;
     }
+
+	save(): BlockSaveData {
+		return {
+			type: "image",
+			data: {
+				url: this.image,
+			},
+		}
+	}
 }

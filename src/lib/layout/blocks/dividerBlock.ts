@@ -1,4 +1,4 @@
-import { Block, Lithograph } from "../lithograph";
+import { Block, Lithograph, type BlockSaveData } from "../lithograph";
 
 export class DividerBlock extends Block {
 	constructor(editor: Lithograph, parent: Block | null) {
@@ -20,4 +20,10 @@ export class DividerBlock extends Block {
     render() {
         return `<div class="lpv-divider"><div class="lpv-divider-bar"></div></div>`;
     }
+	save(): BlockSaveData {
+		return {
+			type: "divider",
+			data: {},
+		}
+	}
 }

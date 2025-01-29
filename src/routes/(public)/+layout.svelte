@@ -2,6 +2,6 @@
 	let { children } = $props();
 </script>
 
-rahh navbar
+<h1>navbar</h1>
 
 {@render children()}

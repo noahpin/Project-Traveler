@@ -13,6 +13,11 @@ type BlockPositionContext = {
 	parent: Lithograph | Block;
 	insertBefore: HTMLElement | null;
 };
+
+export type BlockSaveData = {
+	type: string;
+	data: any;
+}
 export class Lithograph {
 	container: HTMLElement;
 	nestingContainer: HTMLElement;
@@ -82,6 +87,7 @@ export class Lithograph {
 				this.onPointerMoveAddBlock(event);
 			}).bind(this)
 		);
+		this.enableFlex();
 	}
 
 	enableFlex() {
@@ -819,6 +825,14 @@ export class Lithograph {
             this.modalContainer.remove();
 		}, 300);
 	}
+
+	getJSON() {
+		let json: BlockSaveData[] = [];
+		this.childBlocks.forEach((block) => {
+			json.push(block.save());
+		});
+		return json;
+	}
 }
 
 export class Block {
@@ -920,6 +934,7 @@ export class Block {
 	renderTopbarButtons(): HTMLElement[] {
 		return [];
 	}
+
 
 	deleteBlock() {
 		this.editor.deleteBlock(this);
@@ -1123,7 +1138,12 @@ export class Block {
 		}
 	}
 
-	save() {}
+	save(): BlockSaveData {
+		return {
+			type: "blank",
+			data: {}
+		};
+	}
 
 	render() {
 		return `[ERROR] This [${this.title}] block does not have a render method!`;

@@ -1,6 +1,6 @@
-import { Block, Lithograph } from "../lithograph";
+import { Block, Lithograph, type BlockSaveData } from "../lithograph";
 
-export class ColumnBlock extends Block {
+export class ContainerBlock extends Block {
     size: {numerator: number, denominator: number} = {numerator: 1, denominator: 1};
     static sizes: {numerator: number, denominator: number}[] = [
         {numerator: 1, denominator: 1},
@@ -27,7 +27,7 @@ export class ColumnBlock extends Block {
     }
 
     static get blockConfigurations() {
-        let arr = ColumnBlock.sizes.map((s) => {
+        let arr = ContainerBlock.sizes.map((s) => {
             let name = `${s.numerator}/${s.denominator}`;
             return {
                 name,
@@ -78,11 +78,11 @@ export class ColumnBlock extends Block {
     }
 
     incrementSize(decrement: boolean = false) {
-        let index = ColumnBlock.sizes.findIndex((s) => s.numerator == this.size.numerator && s.denominator == this.size.denominator);
+        let index = ContainerBlock.sizes.findIndex((s) => s.numerator == this.size.numerator && s.denominator == this.size.denominator);
         index += decrement ? -1 : 1;
-        if(index < 0 ) index+= ColumnBlock.sizes.length;
-        if(index >= ColumnBlock.sizes.length) index-= ColumnBlock.sizes.length;
-        this.size = ColumnBlock.sizes[index];
+        if(index < 0 ) index+= ContainerBlock.sizes.length;
+        if(index >= ContainerBlock.sizes.length) index-= ContainerBlock.sizes.length;
+        this.size = ContainerBlock.sizes[index];
         this.sizePreview.innerHTML = `${this.size.numerator}/${this.size.denominator}`;
         this.container.style.setProperty("--numerator", this.size.numerator.toString());
         this.container.style.setProperty("--denominator", this.size.denominator.toString());
@@ -106,5 +106,14 @@ export class ColumnBlock extends Block {
             content += child.render();
         });
         return `<div class="lpv-container" style="width: calc(${this.size.numerator}/${this.size.denominator} * 100%);">${content}</div>`;
+    }
+    save(): BlockSaveData {
+        return {
+            type: "container",
+            data: {
+                size: this.size,
+                children: this.childBlocks.map((child) => child.save()),
+            },
+        }
     }
 }

@@ -23,7 +23,7 @@ import FontFamily from "@tiptap/extension-font-family";
 import TextAlign from "@tiptap/extension-text-align";
 import TextStyle from "@tiptap/extension-text-style";
 import { Editor } from "@tiptap/core";
-import { Block, type Lithograph } from "../lithograph";
+import { Block, type Lithograph, type BlockSaveData } from "../lithograph";
 
 export class TextBlock extends Block {
 	textEditor!: Editor;
@@ -196,5 +196,13 @@ export class TextBlock extends Block {
 	}
     render() {
         return `<div class="lpv-text">${this.textEditor.getHTML()}</div>`;
+    }
+    save(): BlockSaveData {
+        return {
+            type: "text",
+            data: {
+                content: this.textEditor.getHTML(),
+            },
+        }
     }
 }

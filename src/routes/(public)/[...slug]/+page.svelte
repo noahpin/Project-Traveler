@@ -1,14 +1,14 @@
 <script>
+	import PageRenderer from "$lib/components/PageRenderer.svelte";
 	let { data } = $props();
 	let { page } = $derived(data);
+	console.log(page)
 </script>
 
-<h1>Welcome to Supabase!</h1>
 {#if data.error}
     {JSON.stringify(data.error)}
 {/if}
-<ul>
-	{JSON.stringify(page)}
-</ul>
+<PageRenderer content={data.page.content.content}></PageRenderer>
+<br>
 
 <a href="/asdf">asdf</a>
