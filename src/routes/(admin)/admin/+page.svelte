@@ -5,7 +5,7 @@
 
 	let {data} = $props();
 
-	let { session, supabase, profile, error } = data
+	let { session, supabase } = data
 	
 	let loading = $state(false)
 	const handleSignOut: SubmitFunction = () => {

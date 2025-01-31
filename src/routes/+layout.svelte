@@ -3,6 +3,7 @@
 	import { onMount } from "svelte";
 
 	import "$lib/app.css"
+	import "$lib/admin.css"
 
 	let { data, children } = $props();
 	let { session, supabase } = $derived(data);
