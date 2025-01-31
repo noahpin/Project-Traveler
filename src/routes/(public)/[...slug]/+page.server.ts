@@ -1,12 +1,12 @@
 import { error } from '@sveltejs/kit';
 import type { EntryGenerator, PageServerLoad } from './$types';
 
-// export const entries: EntryGenerator = async () => {
-// 	const res = await fetch('https://yourdomain.com/api/get-all-slugs');
-// 	const slugs = await res.json();
+export const entries: EntryGenerator = async () => {
+	const res = await fetch('https://project-traveler.vercel.app/api/get-all-slugs');
+	const slugs = await res.json();
   
-// 	return slugs.map((slug: string) => ({ slug }));
-// };
+	return slugs.map((slug: string) => ({ slug }));
+};
 
 export const load: PageServerLoad = async ({ locals: { supabase, session }, params }) => {
 	let fullPath = "/" + params.slug;
