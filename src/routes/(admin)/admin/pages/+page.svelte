@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from "svelte";
     import AdminGrid from "$lib/components/AdminGrid.svelte";
+	import { goto } from "$app/navigation";
 
 	let { data } = $props();
 
@@ -23,7 +24,7 @@
 			key: "title",
 		},
 		{
-			label: "Date",
+			label: "Updated At",
 			key: "updated_at",
 		},
 		{
@@ -40,13 +41,27 @@
         }
 	];
 
+	async function newPage() {
+		let {data, error} = await supabase.from('posts').insert([{post_type: 'page'}]).select().single();
+		goto(`/admin/edit/${data.id}`);
+	}
+
 	onMount(async () => {
 		posts = await loadPosts();
 	});
 </script>
 
-<div class="admin-page-header">
-	<h1>Pages</h1>
-</div>
+<div class="admin-page-content">
+	<div class="admin-page-header">
+		<h1>Pages</h1>
 
-<AdminGrid {displayFields} {posts}></AdminGrid>
+        <div class="admin-page-header-buttons">
+            <button onclick={newPage} class="admin-page-header-button button-green">
+				<i class="ti ti-plus"></i>
+				New Page
+            </button>
+        </div>
+	</div>
+
+	<AdminGrid {displayFields} {posts}></AdminGrid>
+</div>

@@ -4,7 +4,6 @@
 	let session = $derived(data.session);
 	let pageData = $derived(data.page);
 	let { children } = $props();
-	console.log("PUBLIC LAYOUT LOADED");
 	// $inspect(data, pageData);
 </script>
 

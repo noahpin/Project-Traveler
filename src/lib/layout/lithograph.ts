@@ -14,6 +14,11 @@ type BlockPositionContext = {
 	insertBefore: HTMLElement | null;
 };
 
+type LithographData = {
+	content: BlockSaveData[];
+	flex: boolean;
+}
+
 export type BlockSaveData = {
 	type: string;
 	data: any;
@@ -52,7 +57,7 @@ export class Lithograph {
 	addBlockDown: boolean = false;
 	downConfig!: null;
 	addDragPreview!: HTMLElement;
-	constructor(configuration: { container: HTMLElement; blockTypes: AnyBlock[] }) {
+	constructor(configuration: { container: HTMLElement; blockTypes: AnyBlock[], data: LithographData | null }) {
 		this.container = configuration.container;
 		this.blockTypes = configuration.blockTypes;
 		this.container.classList.add("led-container");
@@ -71,6 +76,18 @@ export class Lithograph {
 		this.previewWindow.classList.add("led-preview");
 		this.container.appendChild(this.previewWindow);
 
+		if(configuration.data != null) {
+			configuration.data.content.forEach((blockData) => {
+				let blockType = this.blockTypes.find((e) => e.blockName == blockData.type);
+				if(blockType != null) {
+					this.createBlockWithSaveData(blockType, blockData, null);
+				}
+			})
+			if(configuration.data.flex) {
+				this.enableFlex();
+			}
+		}
+
 		//@ts-ignore
 		window.lithograph = this;
 
@@ -87,7 +104,6 @@ export class Lithograph {
 				this.onPointerMoveAddBlock(event);
 			}).bind(this)
 		);
-		this.enableFlex();
 	}
 
 	enableFlex() {
@@ -329,6 +345,28 @@ export class Lithograph {
 			this.moveBlock(block, position);
 		}
 		return block;
+	}
+
+	createBlockWithSaveData(
+		blockType: new (editor: Lithograph, parent: Block | null) => Block,
+		data: BlockSaveData,
+		position: BlockPositionContext | null = null
+	) {
+		let block = new blockType(this, null);
+		block.createBlock();
+		this.childBlocks.push(block);
+		this.allBlocks.push(block);
+		this.editorOffset = this.nestingContainer.getBoundingClientRect();
+		block.setData(data.data);
+		this.calculateHeights();
+		if (position != null) {
+			this.moveBlock(block, position);
+		}
+		return block;
+	}
+
+	getBlockByNameString(name: string) {
+		return this.blockTypes.find((e) => e.blockName == name);
 	}
 
 	deleteBlock(block: Block) {
@@ -930,6 +968,7 @@ export class Block {
 	}
 
 	configure(...args: any[]) {}
+	setData(data: any) {}
 
 	renderTopbarButtons(): HTMLElement[] {
 		return [];
@@ -941,6 +980,9 @@ export class Block {
 	}
 
 	static get blockType() {
+		return "";
+	}
+	static get blockName() {
 		return "";
 	}
 

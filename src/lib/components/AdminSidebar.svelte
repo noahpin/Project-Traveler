@@ -12,8 +12,8 @@
 
 <div class="admin-sidebar">
 	<div class="logo">
-		<i class="ti ti-horse"></i>
-		<p>Traveler</p>
+		<i class="ti ti-flower"></i>
+		<p>Blossom</p>
 	</div>
 	<div class="gap"></div>
 	<div class="button-wrapper">

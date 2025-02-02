@@ -93,11 +93,35 @@ a {
     justify-content: space-between;
     position: sticky;
     top: 0;
+    flex-shrink: 0;
 }
 .admin-page-header h1 {
     margin: 0;
     font-size: 16px;
     font-weight: 400;
+    text-transform: capitalize;
+}
+.admin-page-header-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.admin-page-header-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background: var(--accent);
+    color: white;
+    cursor: pointer;
+    font-family: "Geist Mono";
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+.admin-editor {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
 }
 
 .admin-grid {
@@ -106,29 +130,41 @@ a {
     overflow-x: scroll;
     display: grid;
     grid-template-rows: 35px repeat(8, 55px);
-    grid-template-columns: 45px 225px 100px 180px 100px 180px 400px;
+    grid-template-columns: 45px 225px 100px 180px 120px 180px 400px;
 }
 .admin-grid-row {
     display: contents;
+}
+.admin-grid-row:hover .admin-grid-cell {
+    background: var(--accent-bg);
+    cursor: pointer;
+}
+.admin-grid-row:hover .admin-grid-emphasis {
+    color: var(--accent);
+    text-decoration: underline;
 }
 
 .admin-grid-cell {
     display: flex;
     align-items: center;
     padding: 12px;
-    color: #7a7a81;
+    color: #07072389;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.094);
 }
 .admin-grid-header .admin-grid-cell {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.094);
     font-family: "Geist Mono";
     text-transform: uppercase;
     font-size: 14px;
-    background: white;
-
+    background: white !important;
+    position: sticky;
+    top: 0;
 }
 
 .admin-grid-emphasis {
     color: black;
+}
+.admin-grid-emphasis:hover {
+    text-decoration: underline;
 }
 
 .admin-grid-status-draft, .admin-grid-status-published, .admin-grid-status-scheduled {
@@ -142,15 +178,27 @@ a {
 .admin-grid-status-published {
     color: #00b300;
     border: 1px solid #00b300;
+    background: white;
+    outline: 2px solid white;
+    text-decoration: none !important;
+    text-decoration-style: none !important;
 }
 .admin-grid-status-scheduled {
     color: #1a73e8;
     border: 1px solid #1a73e8;
+    background: white;
+    outline: 2px solid white;
+    text-decoration: none !important;
+    text-decoration-style: none !important;
 }
 
 .admin-grid-status-draft {
     color: #ff9900;
     border: 1px solid #ff9900;
+    background: white;
+    outline: 2px solid white;
+    text-decoration: none !important;
+    text-decoration-style: none !important;
 }
 
 .admin-grid-loader {
@@ -164,7 +212,7 @@ a {
 .admin-grid-loader i {
     font-size: 30px;
     color: var(--accent);
-    animation: rotate 1s cubic-bezier(0,.69,1,.29) infinite;
+    animation: rotate 1s cubic-bezier(.19,.74,.83,.55) infinite;
 }
 
 @keyframes rotate {
@@ -196,4 +244,10 @@ a {
     background: repeating-linear-gradient(45deg, #ff9900, #ff9900 10px, #ffae00 10px, #ffae00 20px);
     box-shadow: inset 0 -10px 20px 0 rgba(86, 37, 4, 0.097);
     color: black;
+}
+
+.admin-page-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }

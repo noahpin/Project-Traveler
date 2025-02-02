@@ -25,6 +25,17 @@ export class ContainerBlock extends Block {
     static get blockType() {
         return "layout"
     }
+    static get blockName() {
+        return "container"
+    }
+
+    setData(data: any) {
+        this.size = data.size;
+        this.configure(this.size);
+        data.children.forEach((childData: BlockSaveData) => {
+            let block = this.editor.createBlockWithSaveData(this.editor.getBlockByNameString(childData.type)!, childData, {parent: this, insertBefore: null});
+        });
+    }
 
     static get blockConfigurations() {
         let arr = ContainerBlock.sizes.map((s) => {
@@ -37,23 +48,14 @@ export class ContainerBlock extends Block {
         return arr;
     }
 
-    configure(size: {numerator: number, denominator: number, flex: boolean}) {
+    configure(size: {numerator: number, denominator: number}) {
         super.configure();
-        console.log(size)
         this.size = size;
         this.container.style.setProperty("--numerator", this.size.numerator.toString());
         this.container.style.setProperty("--denominator", this.size.denominator.toString());
         this.nestingContainer!.style.setProperty("--numerator", this.size.numerator.toString());
         this.sizePreview.innerHTML = `${this.size.numerator}/${this.size.denominator}`;
-        if(size.flex) {
-            this.container.classList.remove("led-standard-container-block");
-            this.container.classList.add("led-flex-container-block")
-            this.titleElement!.innerHTML = "Flex Container";
-        }else {
-            this.container.classList.remove("led-flex-container-block")
-            this.container.classList.add("led-standard-container-block");
-            this.titleElement!.innerHTML = "Container";
-        }
+        this.titleElement!.innerHTML = "Container";
     }
 
 

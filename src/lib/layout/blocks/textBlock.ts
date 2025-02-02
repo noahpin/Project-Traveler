@@ -47,6 +47,15 @@ export class TextBlock extends Block {
         return "content"
     }
 
+    static get blockName() {
+        return "text"
+    }
+
+	setData(data: any) {
+        this.textEditor.commands.setContent(data.content);
+
+    }
+
     renderTopbarButtons() {
         let button = document.createElement("button");
         button.innerHTML = `<i class="ti ti-arrows-maximize"></i>`;

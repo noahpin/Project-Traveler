@@ -10,6 +10,12 @@ export class DividerBlock extends Block {
     static get blockType() {
         return "content"
     }
+    static get blockName() {
+        return "divider"
+    }
+	setData(data: any): void {
+		
+	}
 
 	createBlock() {
 		super.createBlock();

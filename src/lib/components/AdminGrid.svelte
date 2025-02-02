@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+
 	let {
 		displayFields,
 		posts,
@@ -9,7 +11,7 @@
 </script>
 
 {#snippet row(post: { [x: string]: any }, i: number)}
-	<div class="admin-grid-row" style:grid-row={`${i + 2} / ${i + 3}`}>
+	<div role="button" tabindex="0" class="admin-grid-row" onclick={()=>goto(`/admin/edit/${post.id}`)} onkeydown={()=>goto(`/admin/edit/${post.id}`)} style:grid-row={`${i + 2} / ${i + 3}`}>
 		<div class="admin-grid-cell" style:grid-column={`1 / 2`}>
 			<input type="checkbox" />
 		</div>
@@ -51,7 +53,7 @@
 		</div>
 
 		{#each posts as post, i}
-			{@render row(post, i)}
+        {@render row(post, i)}
 		{/each}
 	</div>
 {:else}

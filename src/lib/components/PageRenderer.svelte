@@ -4,7 +4,7 @@
 	let { content }: {content: {content: any[], flex: boolean | null}} = $props();
 </script>
 
-<div class={"traveler-page-root " + (content.flex ? "traveler-flex" : "")}>
+<div class={"blossom-page-root " + (content.flex ? "blossom-flex" : "")}>
 	{#if content}
 		{#each content.content as block}
 			{@const Block = componentMap[block.type]}

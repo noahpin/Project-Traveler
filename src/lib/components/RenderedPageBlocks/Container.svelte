@@ -12,7 +12,7 @@
 </script>
 
 <div
-	class="traveler-container"
+	class="blossom-container"
 	style:width={`${(blockData.size.numerator / blockData.size.denominator) * 100}%`}
 >
 	{#if blockData}

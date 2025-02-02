@@ -1,21 +1,23 @@
 :root {
-    --bg: #f9f9f9;
-    --border-light: #d4d4da;
+    --bg: #ffffff;
+    --border-light: rgba(0, 0, 0, 0.094);
     --block-bg: #fff;
-    --border: #cacbd0;
+    --border: rgba(0, 0, 0, 0.094);
     --top-bar-bg: #c9cad1c5;
     --top-bar-height: 25px;
     --top-bar-bg-opaque: #cecfd2;
-    --accent: #fd9c00;
+    --accent: #f3008a;
+    --accent-bg: #ffeaf7;
 }
 
 .led-container {
     position: relative;
     box-sizing: border-box;
-    width: 100vw;
+    width: 100%;
     max-width: 1100px;
     padding: 20px;
     margin: auto;
+    height: 100%;
 }
 
 .led-editor,
@@ -39,6 +41,13 @@
     flex-wrap: wrap;
     padding-bottom: 0;
     padding-right: 0;
+}
+.lpv-flex-content {
+    align-items:start;
+    display: flex;
+    align-items: flex-start;
+    align-content: flex-start;
+    flex-wrap: wrap;
 }
 
 .led-nesting-container {
@@ -99,7 +108,7 @@
     top: 0;
     left: 0;
     transform: translate(-1px, -1px);
-    background: var(--accent);
+    background: var(--accent-bg);
     border-radius: 4px;
     transition: 0.1s;
 }
@@ -123,13 +132,13 @@
 }
 
 .led-toolbar-button:hover {
-    color: black;
+    color: var(--accent);
     cursor: pointer;
     outline: 2px solid var(--accent);
 }
 
 .led-toolbar-button-active {
-    color: black;
+    color: var(--accent);
 }
 
 .led-toolbar-block-palette {
@@ -173,7 +182,7 @@
 }
 
 .led-toolbar-block-palette-button:hover {
-    color: black;
+    color: var(--accent);
     cursor: pointer;
     outline: 2px solid var(--accent);
 }
@@ -247,7 +256,8 @@
 }
 
 .led-top-bar-button:hover {
-    background: var(--accent);
+    background: var(--accent-bg);
+    color: var(--accent)
 }
 
 .led-top-bar-button i {
@@ -593,7 +603,7 @@ mark {
     align-content: flex-start;
     flex-wrap: wrap;
 }
-.lpv-container {
+.lpv-container-float-right {
     float: right;
 }
 .lpv-image {
