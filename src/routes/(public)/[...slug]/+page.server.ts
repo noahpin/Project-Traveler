@@ -1,4 +1,4 @@
-export const prerender = 'auto'; // Prerenders at build time, but allows new posts via SSR
+// export const prerender = 'auto'; // Prerenders at build time, but allows new posts via SSR
 export const ssr = true;
 import { error } from '@sveltejs/kit';
 import type { EntryGenerator, PageServerLoad } from './$types';
