@@ -1,12 +1,14 @@
 <script>
     import AdminSidebar from "$lib/components/AdminSidebar.svelte";
     let { children, data } = $props();
+    import  {page} from "$app/state"
     let { supabase } = $derived(data);
+    let closed = $derived(page.url.toString().includes("edit"));
 </script>
 
 <div class="admin-root">
 
-<AdminSidebar {supabase} />
+<AdminSidebar {closed} {supabase} />
 <main class="admin-main">
     {@render children()}
 </main>

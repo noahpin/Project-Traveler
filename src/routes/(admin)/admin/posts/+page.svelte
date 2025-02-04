@@ -39,6 +39,10 @@
 			label: "Scheduled Date",
 			key: "scheduled_date",
 		},
+		{
+			label: "ID",
+			key: "id"
+		}
 	];
 
 	async function newPost() {

@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
 	import { page } from "$app/state";
+	import type { SupabaseClient } from "@supabase/supabase-js";
 	import { redirect } from "@sveltejs/kit";
-	let {supabase} = $props();
+	let {supabase, closed}: {supabase: SupabaseClient, closed: boolean} = $props();
+
 
     function signOut() {
         supabase.auth.signOut();
@@ -10,7 +12,7 @@
     }
 </script>
 
-<div class="admin-sidebar">
+<div class="admin-sidebar" class:admin-sidebar-closed={closed}>
 	<div class="logo">
 		<i class="ti ti-flower"></i>
 		<p>Blossom</p>
@@ -81,7 +83,7 @@
 		</button>
 	</div>
 	<div class="button-wrapper">
-		<button class="button-sidebar" on:click={signOut}>
+		<button class="button-sidebar" onclick={signOut}>
 			<i class="ti ti-logout"></i>
 			<p>Sign Out</p>
 		</button>

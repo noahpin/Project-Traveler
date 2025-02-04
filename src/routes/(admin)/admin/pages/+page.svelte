@@ -17,11 +17,14 @@
 			.range(0, 49);
 		return pages;
 	}
-
 	let displayFields = [
 		{
 			label: "Title",
 			key: "title",
+		},
+		{
+			label: "Slug",
+			key: "slug",
 		},
 		{
 			label: "Updated At",
@@ -35,10 +38,10 @@
 			label: "Scheduled Date",
 			key: "scheduled_date",
 		},
-        {
-            label: "ID",
-            key: "id",
-        }
+		{
+			label: "ID",
+			key: "id"
+		}
 	];
 
 	async function newPage() {

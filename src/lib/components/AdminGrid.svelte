@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
+	import { goto } from "$app/navigation";
 
 	let {
 		displayFields,
@@ -11,7 +11,14 @@
 </script>
 
 {#snippet row(post: { [x: string]: any }, i: number)}
-	<div role="button" tabindex="0" class="admin-grid-row" onclick={()=>goto(`/admin/edit/${post.id}`)} onkeydown={()=>goto(`/admin/edit/${post.id}`)} style:grid-row={`${i + 2} / ${i + 3}`}>
+	<div
+		role="button"
+		tabindex="0"
+		class="admin-grid-row"
+		onclick={() => goto(`/admin/edit/${post.id}`)}
+		onkeydown={() => goto(`/admin/edit/${post.id}`)}
+		style:grid-row={`${i + 2} / ${i + 3}`}
+	>
 		<div class="admin-grid-cell" style:grid-column={`1 / 2`}>
 			<input type="checkbox" />
 		</div>
@@ -31,8 +38,12 @@
 					<span class={"admin-grid-status-" + post[field.key]}
 						>{post[field.key]}</span
 					>
-				{:else}
-					{post[field.key]}
+				{:else if field.key == "slug"}
+				<a href={field.key} target="_blank">
+					<span style:font-family={"Geist Mono"}>
+						/{post[field.key]}
+					</span></a>
+				{:else}{post[field.key]}
 				{/if}
 			</div>
 		{/each}
@@ -53,7 +64,7 @@
 		</div>
 
 		{#each posts as post, i}
-        {@render row(post, i)}
+			{@render row(post, i)}
 		{/each}
 	</div>
 {:else}
