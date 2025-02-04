@@ -8,6 +8,8 @@ It is responsible for the following:
 
 The grid system can be treated similar to a single column, 
 */
+import { computePosition, } from "@floating-ui/core";
+import { platform , flip, offset, shift} from "@floating-ui/dom";
 type AnyBlock = typeof Block;
 type BlockPositionContext = {
 	parent: Lithograph | Block;
@@ -17,12 +19,12 @@ type BlockPositionContext = {
 type LithographData = {
 	content: BlockSaveData[];
 	flex: boolean;
-}
+};
 
 export type BlockSaveData = {
 	type: string;
 	data: any;
-}
+};
 export class Lithograph {
 	container: HTMLElement;
 	nestingContainer: HTMLElement;
@@ -40,7 +42,7 @@ export class Lithograph {
 	previewWindow: HTMLDivElement;
 	blockPalette!: HTMLDivElement;
 	blockTypes: (typeof Block)[];
-    modalContainer!: HTMLElement;
+	modalContainer!: HTMLElement;
 	pageGroupElements!: {
 		slider: HTMLDivElement;
 		container: HTMLDivElement;
@@ -57,7 +59,11 @@ export class Lithograph {
 	addBlockDown: boolean = false;
 	downConfig!: null;
 	addDragPreview!: HTMLElement;
-	constructor(configuration: { container: HTMLElement; blockTypes: AnyBlock[], data: LithographData | null }) {
+	constructor(configuration: {
+		container: HTMLElement;
+		blockTypes: AnyBlock[];
+		data: LithographData | null;
+	}) {
 		this.container = configuration.container;
 		this.blockTypes = configuration.blockTypes;
 		this.container.classList.add("led-container");
@@ -76,14 +82,16 @@ export class Lithograph {
 		this.previewWindow.classList.add("led-preview");
 		this.container.appendChild(this.previewWindow);
 
-		if(configuration.data != null) {
+		if (configuration.data != null) {
 			configuration.data.content.forEach((blockData) => {
-				let blockType = this.blockTypes.find((e) => e.blockName == blockData.type);
-				if(blockType != null) {
+				let blockType = this.blockTypes.find(
+					(e) => e.blockName == blockData.type
+				);
+				if (blockType != null) {
 					this.createBlockWithSaveData(blockType, blockData, null);
 				}
-			})
-			if(configuration.data.flex) {
+			});
+			if (configuration.data.flex) {
 				this.enableFlex();
 			}
 		}
@@ -414,7 +422,7 @@ export class Lithograph {
 
 	moveBlock(block: Block, blockPositionContext: BlockPositionContext) {
 		block.parentElement = blockPositionContext.parent.nestingContainer!;
-		
+
 		//now move the block from this child block to the new parents child block array
 		block.parent!.childBlocks.splice(
 			block.parent!.childBlocks.indexOf(block),
@@ -422,7 +430,6 @@ export class Lithograph {
 		);
 
 		blockPositionContext.parent.childBlocks.push(block);
-		
 
 		block.parent = blockPositionContext.parent;
 		if (blockPositionContext.insertBefore != null) {
@@ -466,7 +473,7 @@ export class Lithograph {
 			} else {
 				b.container.classList.add("led-block-focused");
 			}
-		})
+		});
 	}
 
 	calculateDropPoint(
@@ -475,7 +482,8 @@ export class Lithograph {
 		selfBlock: Block | null = null
 	): BlockPositionContext {
 		//group block positions by rows
-		let blockPositionsByRowsIntermediate: { rect: DOMRect; block: Block }[][] = [];
+		let blockPositionsByRowsIntermediate: { rect: DOMRect; block: Block }[][] =
+			[];
 		let curRow: { rect: DOMRect; block: Block }[];
 		let lastTop = 0;
 		if (this.blockPositions.length == 0) {
@@ -498,8 +506,10 @@ export class Lithograph {
 		let blockPositionsByRows: { rect: DOMRect; block: Block }[][] = [];
 		//now i need to go through all the rows, sort by the parents of the elements and ensure they all have the same parent. i split rows into different rows if they do not have the same element
 		blockPositionsByRowsIntermediate.sort((a, b) => {
-			return a[0].block.parentElement.compareDocumentPosition(b[0].block.parentElement);
-		})
+			return a[0].block.parentElement.compareDocumentPosition(
+				b[0].block.parentElement
+			);
+		});
 
 		blockPositionsByRowsIntermediate.forEach((row) => {
 			let curParent = row[0].block.parentElement;
@@ -595,26 +605,34 @@ export class Lithograph {
 			});
 		});
 
-		if(highestHoveredBlock! && highestHoveredBlock.block == selfBlock) {
+		if (highestHoveredBlock! && highestHoveredBlock.block == selfBlock) {
 			let index = selfBlock.parent.childBlocks.indexOf(selfBlock);
 			let prepend: HTMLElement | null = null;
 			let padding = 20;
 			this.dropPreview.style.left =
-			highestHoveredBlock!.rect.left - this.editorOffset.left + padding / 2 + "px";
+				highestHoveredBlock!.rect.left -
+				this.editorOffset.left +
+				padding / 2 +
+				"px";
 			this.dropPreview.style.top =
-			highestHoveredBlock!.rect.top - this.editorOffset.top + (highestHoveredBlock!.rect.height / 2) - 10 + padding / 2 + "px";
-			this.dropPreview.style.width = highestHoveredBlock!.rect.width - padding + "px";
+				highestHoveredBlock!.rect.top -
+				this.editorOffset.top +
+				highestHoveredBlock!.rect.height / 2 -
+				10 +
+				padding / 2 +
+				"px";
+			this.dropPreview.style.width =
+				highestHoveredBlock!.rect.width - padding + "px";
 			this.dropPreview.style.height = 4 + "px";
-			
-			if(selfBlock.parent.childBlocks[index + 1]) {
+
+			if (selfBlock.parent.childBlocks[index + 1]) {
 				prepend = selfBlock.parent.childBlocks[index + 1].container;
 			}
 			return {
 				parent: selfBlock.parent,
-				insertBefore: prepend
-			}
-		}	
-
+				insertBefore: prepend,
+			};
+		}
 
 		// if (closestBlock! != null) {
 		// 	closestBlock.block.container.style.outline = "2px solid orange";
@@ -644,14 +662,14 @@ export class Lithograph {
 		let horPadding = 30;
 		let vertPadding = 20;
 
-
 		if (
 			relativeToBlock == null &&
 			closestBlock! == null &&
 			highestHoveredBlock! != null
 		) {
-			let containerRect = highestHoveredBlock!.block.nestingContainer?.getBoundingClientRect();
-			if(containerRect != null) {
+			let containerRect =
+				highestHoveredBlock!.block.nestingContainer?.getBoundingClientRect();
+			if (containerRect != null) {
 				this.dropPreview.classList.add("led-drop-preview-horizontal");
 				this.dropPreview.style.left =
 					containerRect.left - this.editorOffset.left + horPadding / 2 + "px";
@@ -731,16 +749,16 @@ export class Lithograph {
 			let firstBlock = relativeToBlockRow![0];
 			let lastBlock = relativeToBlockRow![relativeToBlockRow!.length - 1];
 			let parent = relativeToBlock!.block.parent!;
-			
+
 			let prependBlock: Block | null = null;
 			let placeAfter = false;
-			if(offset) {
+			if (offset) {
 				let indexOfLast = parent.childBlocks.indexOf(lastBlock.block)!;
-				if(parent.childBlocks[indexOfLast + 1]) {
+				if (parent.childBlocks[indexOfLast + 1]) {
 					prependBlock = parent.childBlocks[indexOfLast + 1];
 				}
 				placeAfter = true;
-			}else {
+			} else {
 				prependBlock = firstBlock.block;
 			}
 
@@ -751,7 +769,7 @@ export class Lithograph {
 				}
 			});
 
-			if(prependBlock) {
+			if (prependBlock) {
 				blockPositionContext.insertBefore = prependBlock.container;
 			}
 			let containerRect =
@@ -759,7 +777,10 @@ export class Lithograph {
 			this.dropPreview.style.left =
 				containerRect.left + horPadding / 2 - this.editorOffset.left + "px";
 			this.dropPreview.style.top =
-			firstBlock.rect.top - this.editorOffset.top + (placeAfter ? 2 : -6) + (placeAfter ? tallestInRow : 0)+
+				firstBlock.rect.top -
+				this.editorOffset.top +
+				(placeAfter ? 2 : -6) +
+				(placeAfter ? tallestInRow : 0) +
 				"px";
 			this.dropPreview.style.width = containerRect.width - horPadding + "px";
 			this.dropPreview.style.height = "4px";
@@ -773,22 +794,33 @@ export class Lithograph {
 			let prependBlock: Block | null = null;
 			let placeAfter = false;
 			if (offset) {
-				let indexOfRelative = parent.childBlocks.indexOf(relativeToBlock!.block);
-				if(parent.childBlocks[indexOfRelative + 1]) {
+				let indexOfRelative = parent.childBlocks.indexOf(
+					relativeToBlock!.block
+				);
+				if (parent.childBlocks[indexOfRelative + 1]) {
 					prependBlock = parent.childBlocks[indexOfRelative + 1];
 				}
 				placeAfter = true;
-			}else {
+			} else {
 				prependBlock = relativeToBlock!.block;
 			}
 			if (prependBlock) {
 				blockPositionContext.insertBefore = prependBlock.container;
 			}
 			this.dropPreview.style.left =
-				relativeToBlock!.rect.left - this.editorOffset.left + (placeAfter ? 2 : -6) + (placeAfter ? relativeToBlock.rect.width : 0) + "px";
-			this.dropPreview.style.top = relativeToBlock!.rect.top - this.editorOffset.top + vertPadding / 2 + "px"
+				relativeToBlock!.rect.left -
+				this.editorOffset.left +
+				(placeAfter ? 2 : -6) +
+				(placeAfter ? relativeToBlock.rect.width : 0) +
+				"px";
+			this.dropPreview.style.top =
+				relativeToBlock!.rect.top -
+				this.editorOffset.top +
+				vertPadding / 2 +
+				"px";
 			this.dropPreview.style.width = "4px";
-			this.dropPreview.style.height = relativeToBlock!.rect.height - vertPadding+ "px";
+			this.dropPreview.style.height =
+				relativeToBlock!.rect.height - vertPadding + "px";
 		}
 		return blockPositionContext;
 	}
@@ -843,24 +875,19 @@ export class Lithograph {
 		this.downBlock = null;
 	}
 
-	openSettings(block: Block) {
-		
-	}
+	openSettings(block: Block) {}
 
 	createModal(modalElement: HTMLElement) {
-
-        this.modalContainer = document.createElement("div");
-        this.modalContainer.classList.add("led-modal");
-        document.body.appendChild(this.modalContainer);
-        this.modalContainer.appendChild(modalElement);
-
+		this.modalContainer = document.createElement("div");
+		this.modalContainer.classList.add("led-modal");
+		document.body.appendChild(this.modalContainer);
+		this.modalContainer.appendChild(modalElement);
 	}
 
 	closeModal() {
-
-        this.modalContainer.classList.add("led-modal-out");
+		this.modalContainer.classList.add("led-modal-out");
 		setTimeout(() => {
-            this.modalContainer.remove();
+			this.modalContainer.remove();
 		}, 300);
 	}
 
@@ -870,6 +897,29 @@ export class Lithograph {
 			json.push(block.save());
 		});
 		return json;
+	}
+
+	createTooltip(relativeObject: HTMLElement, content: HTMLElement[]): HTMLElement {
+		let tooltip = document.createElement("div");
+		tooltip.classList.add("led-tooltip");
+		content.forEach((element) => {
+			tooltip.appendChild(element);
+		});
+		document.body.appendChild(tooltip);
+		computePosition(relativeObject, tooltip, {
+			placement: "top",
+			platform,
+			middleware: [offset(6)]
+		}).then(({ x, y }) => {
+			Object.assign(tooltip.style, {
+				left: `${x}px`,
+				top: `${y}px`,
+			});
+		});
+		return tooltip;
+	}
+	closeTooltip(tooltip: HTMLElement) {
+		tooltip.remove();
 	}
 }
 
@@ -921,7 +971,9 @@ export class Block {
 	constructor(editor: Lithograph, parent: Block | null) {
 		this.editor = editor;
 		this.parent = parent ?? editor;
-		this.parentElement = parent ? parent.nestingContainer! : editor.nestingContainer;
+		this.parentElement = parent
+			? parent.nestingContainer!
+			: editor.nestingContainer;
 		this.title = "Block";
 	}
 	createBlock() {
@@ -962,7 +1014,12 @@ export class Block {
 		document.addEventListener("pointermove", this.onPointerMove.bind(this));
 		document.addEventListener("pointerup", this.onPointerUp.bind(this));
 
-		let focusEl = [this.topBar, this.contentContainer, this.moveableContainer, this.container, ];
+		let focusEl = [
+			this.topBar,
+			this.contentContainer,
+			this.moveableContainer,
+			this.container,
+		];
 		this.validFocusElements.push(...focusEl);
 		this.container.addEventListener("click", this.focus.bind(this));
 	}
@@ -973,7 +1030,6 @@ export class Block {
 	renderTopbarButtons(): HTMLElement[] {
 		return [];
 	}
-
 
 	deleteBlock() {
 		this.editor.deleteBlock(this);
@@ -1009,9 +1065,9 @@ export class Block {
 		this.moveableContainer.style.width = this.width + "px";
 		this.moveableContainer.style.height = this.height + "px";
 		let correctRect;
-		if(this.parent instanceof Lithograph) {
+		if (this.parent instanceof Lithograph) {
 			correctRect = this.parent.nestingContainer.getBoundingClientRect();
-		}else {
+		} else {
 			correctRect = this.parent.container!.getBoundingClientRect();
 		}
 		this.posX = rect.left - correctRect.left;
@@ -1170,12 +1226,12 @@ export class Block {
 	}
 
 	focus(event: MouseEvent | null, bypassCheck: boolean = false) {
-		if(bypassCheck) {
+		if (bypassCheck) {
 			this.editor.onBlockFocus(this);
 			return;
 		}
-		if(event == null) return;
-		if(this.validFocusElements.includes(event.target as HTMLElement)) {
+		if (event == null) return;
+		if (this.validFocusElements.includes(event.target as HTMLElement)) {
 			this.editor.onBlockFocus(this);
 		}
 	}
@@ -1183,7 +1239,7 @@ export class Block {
 	save(): BlockSaveData {
 		return {
 			type: "blank",
-			data: {}
+			data: {},
 		};
 	}
 

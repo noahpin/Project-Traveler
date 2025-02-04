@@ -5,6 +5,7 @@
 	let { data } = $props();
 	let { page, supabase } = $derived(data);
 	let lithograph;
+	$inspect(page)
 
 	async function updateData() {
 		let data = lithograph!.getJSON();
@@ -30,6 +31,14 @@
 		</button>
 		<h1>Edit {page.post_type}</h1></div>
 		<div class="admin-page-header-buttons">
+
+			<a
+				href={"/"+page.slug}
+				target="_blank"
+				class="admin-page-header-button button-sub"
+			>
+				Go to Live Page<i class="ti ti-external-link"></i>
+			</a>
 			<button
 				onclick={updateData}
 				class="admin-page-header-button button-green"

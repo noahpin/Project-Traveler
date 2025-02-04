@@ -31,6 +31,7 @@ export class TextBlock extends Block {
     closeButton!: HTMLElement;
     styleBar!: HTMLElement;
     rect!: DOMRect;
+    linkTooltip?: HTMLElement;
     static fonts = [
         "Inter",
         "Geist",
@@ -121,7 +122,7 @@ export class TextBlock extends Block {
             { icon: "ti-strikethrough", callback: () => this.textEditor.chain().focus().toggleStrike().run(), extension: Strike },
             { icon: "ti-underline", callback: () => this.textEditor.chain().focus().toggleUnderline().run(), extension: Underline },
             { icon: "ti-highlight", callback: () => this.textEditor.chain().focus().toggleHighlight().run(), extension: Highlight },
-            { icon: "ti-link", callback: () => this.textEditor.chain().focus().setLink({ href: "https://tiptap.dev" }).run(), extension: Link },
+            { icon: "ti-link", callback: (buttonEl: HTMLElement) => this.createLink(buttonEl), extension: Link },
         ];
         //create fonts dropdown
         let fontDropdown = document.createElement("select");
@@ -142,12 +143,26 @@ export class TextBlock extends Block {
             button.classList.add("led-text-style-button");
             button.innerHTML = `<i class="ti ${i.icon}"></i>`;
             button.onclick = () => {
-                i.callback();
+                i.callback(button);
                 button.blur();
             };
             toolbar.appendChild(button);
         });
         return toolbar;
+    }
+
+    createLink(button: HTMLElement) {
+        let url = document.createElement("input");
+        url.placeholder = "Enter URL";
+        url.classList.add("led-tooltip-input");
+        let completeButton = document.createElement("button");
+        completeButton.innerHTML = `<i class="ti ti-check"></i>`;
+        completeButton.classList.add("led-tooltip-button");
+        completeButton.onclick = (() => {
+            this.textEditor.chain().focus().extendMarkRange('link').setLink({ href: url.value }).run();
+            this.editor.closeTooltip(this.linkTooltip!);
+        }).bind(this);
+        this.linkTooltip = this.editor.createTooltip(button, [url, completeButton]);
     }
 
 	createBlock() {
@@ -169,7 +184,12 @@ export class TextBlock extends Block {
 				Text,
 				Bold,
 				Italic,
-				Link,
+				Link.configure({
+                    openOnClick: false,
+                    HTMLAttributes: {
+                        target: null
+                    }
+                }),
 				Strike,
                 Typography,
                 History,
