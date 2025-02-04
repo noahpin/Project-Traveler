@@ -1,0 +1,1 @@
+Sitemap: https://project-traveler.vercel.app/sitemap.xml
