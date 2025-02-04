@@ -4,7 +4,7 @@
 	let session = $derived(data.session);
 	let pageData = $derived(data.page);
 	let { children } = $props();
-	// $inspect(data, pageData);
+	console.log(page.url)
 </script>
 
 <header class="main-header">
