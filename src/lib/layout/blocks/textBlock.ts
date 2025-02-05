@@ -245,7 +245,7 @@ export class TextBlock extends Block {
                 this.focus(null, true);
             },
             onBlur: () => {
-                this.tiptapLinkBubbleMenu.classList.remove("led-tooltip-hidden");
+                this.tiptapLinkBubbleMenu.classList.add("led-tooltip-hidden");
 
             },
             onUpdate: this.tiptapUpdated.bind(this),
