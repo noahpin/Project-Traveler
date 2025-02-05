@@ -12,7 +12,6 @@
     flex-shrink: 0;
     position: relative;
     gap: 10px;
-    transition: width 0.15s;
     overflow: hidden;
 }
 
