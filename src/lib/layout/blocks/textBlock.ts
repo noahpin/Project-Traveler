@@ -204,7 +204,7 @@ export class TextBlock extends Block {
         ui.forEach((el) => {
             this.tiptapLinkBubbleMenu.appendChild(el);
         })
-        document.body.appendChild(this.tiptapLinkBubbleMenu);
+        this.editor.container.appendChild(this.tiptapLinkBubbleMenu);
         console.log(this.tiptapLinkBubbleMenu)
 		this.textEditor = new Editor({
 			element: this.editorContainer,
@@ -244,6 +244,10 @@ export class TextBlock extends Block {
             onFocus: () => {
                 this.focus(null, true);
             },
+            onBlur: () => {
+                this.tiptapLinkBubbleMenu.classList.remove("led-tooltip-hidden");
+
+            },
             onUpdate: this.tiptapUpdated.bind(this),
             onSelectionUpdate: this.tiptapSelectionUpdated.bind(this),
 		}); 
@@ -266,7 +270,7 @@ export class TextBlock extends Block {
     }
     tiptapSelectionUpdated(props: {editor: Editor}) {
         let editor = props.editor;
-        if (editor.isActive("link")) {
+        if (editor.isActive("link") && editor.isFocused) {
             let ranges = editor.state.selection.ranges;
             // console.log(editor.state.selection)
             let view = editor.view;
