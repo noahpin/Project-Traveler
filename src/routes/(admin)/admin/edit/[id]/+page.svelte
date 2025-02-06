@@ -5,7 +5,7 @@
 	let { data } = $props();
 	let { page, supabase } = $derived(data);
 	let lithograph;
-	$inspect(page)
+	// $inspect(page)
 
 	async function updateData() {
 		let data = lithograph!.getJSON();
@@ -13,13 +13,10 @@
 			...page.content,
 		};
 		content.content = data;
-		console.log(page);
-		console.log(data);
 		let { data: dat, error } = await supabase
 			.from("posts")
 			.update({ content: content })
 			.eq("id", page.id);
-		console.log(dat, error);
 	}
 </script>
 

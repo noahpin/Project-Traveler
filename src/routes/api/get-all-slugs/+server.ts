@@ -6,4 +6,4 @@ export async function GET({locals: {supabase}}) {
         return json({error: error.message}, {status: 500});
     }
     return json(slugs.map(post => post.slug));
-}
+}   

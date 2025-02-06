@@ -6,6 +6,7 @@ import type { EntryGenerator, PageServerLoad } from './$types';
 export const config = {
 	isr: {
 	  expiration: 100,
+	  bypassToken: process.env.BYPASS_TOKEN,
 	},
   };
 
