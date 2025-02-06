@@ -24,6 +24,10 @@ import TextAlign from "@tiptap/extension-text-align";
 import TextStyle from "@tiptap/extension-text-style";
 import { Editor } from "@tiptap/core";
 import { Block, type Lithograph, type BlockSaveData } from "../lithograph";
+import BubbleMenu from "@tiptap/extension-bubble-menu";
+import { NodeSelection } from "@tiptap/pm/state";
+import { computePosition, offset } from "@floating-ui/core";
+import { platform } from "@floating-ui/dom";
 
 export class TextBlock extends Block {
 	textEditor!: Editor;
@@ -32,12 +36,14 @@ export class TextBlock extends Block {
     styleBar!: HTMLElement;
     rect!: DOMRect;
     linkTooltip?: HTMLElement;
+    tiptapLinkBubbleMenu!: HTMLElement;
     static fonts = [
         "Inter",
         "Geist",
         "Geist Mono",
         "Source Serif 4",
     ];
+    tiptapLinkBubbleMenuURL!: HTMLInputElement;
 	constructor(editor: Lithograph, parent: Block | null) {
 		super(editor, parent);
 		this.title = "Text";
@@ -90,6 +96,8 @@ export class TextBlock extends Block {
             this.editorContainer.style.left ="50px";
             
         }, 1);
+
+        this.tiptapLinkBubbleMenu.classList.add("led-tooltip-hidden");
     }
 
     closeTextEditor() {
@@ -111,6 +119,8 @@ export class TextBlock extends Block {
             this.contentContainer.style.width = "";
             this.contentContainer.style.height = "";
         }, 380);
+
+        this.tiptapLinkBubbleMenu.classList.add("led-tooltip-hidden");
     }
 
     createTextStyleBar() {
@@ -151,7 +161,7 @@ export class TextBlock extends Block {
         return toolbar;
     }
 
-    createLink(button: HTMLElement) {
+    createLinkEditUI(deleteButton: boolean = false): HTMLElement[] {
         let url = document.createElement("input");
         url.placeholder = "Enter URL";
         url.classList.add("led-tooltip-input");
@@ -162,7 +172,23 @@ export class TextBlock extends Block {
             this.textEditor.chain().focus().extendMarkRange('link').setLink({ href: url.value }).run();
             this.editor.closeTooltip(this.linkTooltip!);
         }).bind(this);
-        this.linkTooltip = this.editor.createTooltip(button, [url, completeButton]);
+        if(deleteButton) {
+            let deleteButton = document.createElement("button");
+            deleteButton.innerHTML = `<i class="ti ti-trash"></i>`;
+            deleteButton.classList.add("led-tooltip-button");
+            deleteButton.onclick = (() => {
+                this.textEditor.chain().focus().unsetLink().run();
+                this.editor.closeTooltip(this.linkTooltip!);
+            }).bind(this);
+            return [url, completeButton, deleteButton];
+        }
+
+        return [url, completeButton];
+
+    }
+
+    createLink(button: HTMLElement) {
+        this.linkTooltip = this.editor.createTooltip(button, this.createLinkEditUI());
     }
 
 	createBlock() {
@@ -170,6 +196,16 @@ export class TextBlock extends Block {
 		this.editorContainer = document.createElement("div");
 		this.editorContainer.classList.add("led-text-block-preview");
 		this.contentContainer.appendChild(this.editorContainer);
+        this.tiptapLinkBubbleMenu = document.createElement("div");
+        this.tiptapLinkBubbleMenu.classList.add("led-tooltip");
+        this.tiptapLinkBubbleMenu.classList.add("led-tooltip-hidden");
+        let ui = this.createLinkEditUI(true);
+        this.tiptapLinkBubbleMenuURL = ui[0] as HTMLInputElement;
+        ui.forEach((el) => {
+            this.tiptapLinkBubbleMenu.appendChild(el);
+        })
+        this.editor.container.appendChild(this.tiptapLinkBubbleMenu);
+        console.log(this.tiptapLinkBubbleMenu)
 		this.textEditor = new Editor({
 			element: this.editorContainer,
 			extensions: [
@@ -207,9 +243,14 @@ export class TextBlock extends Block {
 			],
             onFocus: () => {
                 this.focus(null, true);
-            }
-		});
+            },
+            onBlur: () => {
+                this.tiptapLinkBubbleMenu.classList.add("led-tooltip-hidden");
 
+            },
+            onUpdate: this.tiptapUpdated.bind(this),
+            onSelectionUpdate: this.tiptapSelectionUpdated.bind(this),
+		}); 
 
         this.closeButton = document.createElement("button");
         this.closeButton.innerHTML = `<i class="ti ti-x"></i>`;
@@ -223,6 +264,40 @@ export class TextBlock extends Block {
 
         this.validFocusElements.push(this.editorContainer)
 	}
+    tiptapUpdated() {
+        console.log("Tiptap updated");
+        this.tiptapLinkBubbleMenu.classList.add("led-tooltip-hidden");
+    }
+    tiptapSelectionUpdated(props: {editor: Editor}) {
+        let editor = props.editor;
+        if (editor.isActive("link") && editor.isFocused) {
+            let ranges = editor.state.selection.ranges;
+            // console.log(editor.state.selection)
+            let view = editor.view;
+            const from = Math.min(...ranges.map(range => range.$from.pos))
+            const to = Math.max(...ranges.map(range => range.$to.pos))
+            //get selected node
+            let node = view.nodeDOM(from) as HTMLElement;
+            let nodePos = editor.$pos(from);
+            let nodeEl = editor.$pos(nodePos.from).element;
+            //get url of current selection
+            let link = editor.getAttributes('link').href
+            this.tiptapLinkBubbleMenuURL.value = link;
+            computePosition(nodeEl, this.tiptapLinkBubbleMenu,{platform: platform, placement: "top-start", middleware: [offset(6)]}).then(
+                ({x, y}) => {
+                    Object.assign(this.tiptapLinkBubbleMenu.style, {
+                        left: `${x}px`,
+                        top: `${y}px`,
+                    });
+                    console.log(this.tiptapLinkBubbleMenu)
+                }
+            )
+            this.tiptapLinkBubbleMenu.classList.remove("led-tooltip-hidden");
+        } else {
+            this.tiptapLinkBubbleMenu.classList.add("led-tooltip-hidden");
+            
+        }
+    }
     render() {
         return `<div class="lpv-text">${this.textEditor.getHTML()}</div>`;
     }
