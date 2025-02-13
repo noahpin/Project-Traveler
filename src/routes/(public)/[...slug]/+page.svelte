@@ -11,5 +11,5 @@
 </svelte:head>
 
 {#if page}
-<PageRenderer content={data.page.content}></PageRenderer>
+		<PageRenderer content={data.page.content}></PageRenderer>
 {/if}

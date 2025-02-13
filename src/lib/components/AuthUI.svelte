@@ -22,7 +22,7 @@
 	function loop() {
 		ctx.fillStyle = "#dcdee00f";
 		ctx.fillRect(0, 0, w, h);
-		ctx.fillStyle = "#f3008a";
+		ctx.fillStyle = "#990000";
 		ctx.beginPath();
 		ctx.arc(mX, mY, 100, 0, Math.PI * 2);
 		ctx.closePath();

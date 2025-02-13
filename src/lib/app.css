@@ -16,6 +16,14 @@ html {
     font-family: 'Geist', sans-serif;
     overflow-x: hidden;
 }
+main.page-root {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    overflow-y: auto;
+}
 .blossom-page-root {
     width: 100%;
 }
@@ -41,6 +49,24 @@ html {
     left: 0;
     width: 100%;
     background: white;
+    border-bottom: 1px solid rgba(0,0,0,0.055);
+}
+
+.main-nav-content {
+    height: 54px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 10px 20px;
+}
+
+.main-nav-content .main-nav-logo {
+    height: 100%;
+}
+
+.main-nav-content .main-nav-logo img {
+    height: 100%;
 }
 
 .blossom-page-root a {

@@ -2,10 +2,11 @@
 export const ssr = true;
 import { error } from '@sveltejs/kit';
 import type { EntryGenerator, PageServerLoad } from './$types';
+import moment from 'moment';
 
 export const config = {
 	isr: {
-	  expiration: 100,
+	  expiration: 60,
 	  bypassToken: process.env.BYPASS_TOKEN,
 	},
   };
@@ -19,7 +20,7 @@ export const entries: EntryGenerator = async () => {
 
 export const load: PageServerLoad = async ({ locals: { supabase, session }, params }) => {
 	let fullPath = params.slug;
-	let query = supabase.from('posts').select("content,title,excerpt,status").eq('slug', fullPath);
+	let query = supabase.from('posts').select("content,title,excerpt,status,page_settings").eq('slug', fullPath);
 	if(!session) {
 		query = query.or('status.eq.published,and(status.eq.scheduled,publish_date.lte.' + new Date().toISOString() + ')');
 	}

@@ -8,8 +8,8 @@ It is responsible for the following:
 
 The grid system can be treated similar to a single column, 
 */
-import { computePosition, } from "@floating-ui/core";
-import { platform , flip, offset, shift} from "@floating-ui/dom";
+import { computePosition } from "@floating-ui/core";
+import { platform, flip, offset, shift } from "@floating-ui/dom";
 type AnyBlock = typeof Block;
 type BlockPositionContext = {
 	parent: Lithograph | Block;
@@ -59,10 +59,12 @@ export class Lithograph {
 	addBlockDown: boolean = false;
 	downConfig!: null;
 	addDragPreview!: HTMLElement;
+	enablePreview: boolean;
 	constructor(configuration: {
 		container: HTMLElement;
 		blockTypes: AnyBlock[];
 		data: LithographData | null;
+		enablePreview?: boolean;
 	}) {
 		this.container = configuration.container;
 		this.blockTypes = configuration.blockTypes;
@@ -77,10 +79,12 @@ export class Lithograph {
 		this.dropPreview.classList.add("led-drop-preview");
 		this.nestingContainer.appendChild(this.dropPreview);
 		this.editorOffset = this.nestingContainer.getBoundingClientRect();
+		this.enablePreview = configuration.enablePreview ?? true;
 
 		this.previewWindow = document.createElement("div");
 		this.previewWindow.classList.add("led-preview");
-		this.container.appendChild(this.previewWindow);
+		if(this.enablePreview)
+			this.container.appendChild(this.previewWindow);
 
 		if (configuration.data != null) {
 			configuration.data.content.forEach((blockData) => {
@@ -193,53 +197,54 @@ export class Lithograph {
 			);
 		});
 
-		let viewGroup = document.createElement("div");
-		viewGroup.classList.add("led-toolbar-button-group");
-		topbar.appendChild(viewGroup);
+		if (this.enablePreview) {
+			let viewGroup = document.createElement("div");
+			viewGroup.classList.add("led-toolbar-button-group");
+			topbar.appendChild(viewGroup);
 
-		let editButton = document.createElement("div");
-		editButton.classList.add("led-toolbar-button");
-		editButton.innerHTML = `<i class="ti ti-pencil"></i>Edit`;
-		viewGroup.appendChild(editButton);
+			let editButton = document.createElement("div");
+			editButton.classList.add("led-toolbar-button");
+			editButton.innerHTML = `<i class="ti ti-pencil"></i>Edit`;
+			viewGroup.appendChild(editButton);
 
-		let previewButton = document.createElement("div");
-		previewButton.classList.add("led-toolbar-button");
-		previewButton.innerHTML = `<i class="ti ti-eye"></i>Preview`;
-		viewGroup.appendChild(previewButton);
+			let previewButton = document.createElement("div");
+			previewButton.classList.add("led-toolbar-button");
+			previewButton.innerHTML = `<i class="ti ti-eye"></i>Preview`;
+			viewGroup.appendChild(previewButton);
 
-		let viewGroupSlider = document.createElement("div");
-		viewGroupSlider.classList.add("led-toolbar-button-group-slider");
-		viewGroup.appendChild(viewGroupSlider);
+			let viewGroupSlider = document.createElement("div");
+			viewGroupSlider.classList.add("led-toolbar-button-group-slider");
+			viewGroup.appendChild(viewGroupSlider);
 
-		this.viewGroupElements = {
-			slider: viewGroupSlider,
-			container: viewGroup,
-			elements: [
-				{
-					button: editButton,
-					callback: (() => {
-						this.showEditor();
-					}).bind(this),
-				},
-				{
-					button: previewButton,
-					callback: (() => {
-						this.showPreview();
-					}).bind(this),
-				},
-			],
-		};
+			this.viewGroupElements = {
+				slider: viewGroupSlider,
+				container: viewGroup,
+				elements: [
+					{
+						button: editButton,
+						callback: (() => {
+							this.showEditor();
+						}).bind(this),
+					},
+					{
+						button: previewButton,
+						callback: (() => {
+							this.showPreview();
+						}).bind(this),
+					},
+				],
+			};
 
-		this.viewGroupElements.elements.forEach((e) => {
-			e.button.addEventListener(
-				"click",
-				(() => {
-					this.onGroupButtonClick(this.viewGroupElements, e.button);
-				}).bind(this)
-			);
-		});
-		this.onGroupButtonClick(this.viewGroupElements, editButton);
-
+			this.viewGroupElements.elements.forEach((e) => {
+				e.button.addEventListener(
+					"click",
+					(() => {
+						this.onGroupButtonClick(this.viewGroupElements, e.button);
+					}).bind(this)
+				);
+			});
+			this.onGroupButtonClick(this.viewGroupElements, editButton);
+		}
 		this.blockPalette = document.createElement("div");
 		this.blockPalette.classList.add("led-toolbar-block-palette");
 		this.toolbar.appendChild(this.blockPalette);
@@ -899,7 +904,10 @@ export class Lithograph {
 		return json;
 	}
 
-	createTooltip(relativeObject: HTMLElement, content: HTMLElement[]): HTMLElement {
+	createTooltip(
+		relativeObject: HTMLElement,
+		content: HTMLElement[]
+	): HTMLElement {
 		let tooltip = document.createElement("div");
 		tooltip.classList.add("led-tooltip");
 		content.forEach((element) => {
@@ -909,7 +917,7 @@ export class Lithograph {
 		computePosition(relativeObject, tooltip, {
 			placement: "top",
 			platform,
-			middleware: [offset(6)]
+			middleware: [offset(6)],
 		}).then(({ x, y }) => {
 			Object.assign(tooltip.style, {
 				left: `${x}px`,

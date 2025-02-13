@@ -3,6 +3,7 @@
 	import { page } from "$app/state";
 	import type { SupabaseClient } from "@supabase/supabase-js";
 	import { redirect } from "@sveltejs/kit";
+	import DtLogo from "./DTLogo.svelte";
 	let {supabase, closed}: {supabase: SupabaseClient, closed: boolean} = $props();
 
 
@@ -14,8 +15,7 @@
 
 <div class="admin-sidebar" class:admin-sidebar-closed={closed}>
 	<div class="logo">
-		<i class="ti ti-flower"></i>
-		<p>Blossom</p>
+		<DtLogo></DtLogo>
 	</div>
 	<div class="gap"></div>
 	<div class="button-wrapper">
@@ -57,6 +57,16 @@
 		>
 			<i class="ti ti-tags"></i>
 			<p>Tags</p>
+		</a>
+	</div>
+	<div class="button-wrapper">
+		<a
+			href="/admin/categories"
+			class="button-sidebar"
+			class:button-sidebar-active={page.url.pathname === "/admin/categories"}
+		>
+			<i class="ti ti-category"></i>
+			<p>Categories</p>
 		</a>
 	</div>
 	<div class="button-wrapper">

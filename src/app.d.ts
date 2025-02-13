@@ -15,4 +15,5 @@ declare global {
     // interface PageState {}
     // interface Platform {}
   }
+  type TriStateCheck = "false" | "true" | "indeterminate"
 }

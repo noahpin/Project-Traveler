@@ -6,18 +6,24 @@
     --top-bar-bg: #c9cad1c5;
     --top-bar-height: 25px;
     --top-bar-bg-opaque: #cecfd2;
-    --accent: #f3008a;
-    --accent-bg: #ffeaf7;
+    --accent: #990000;
+    --accent-bg: #ffeaea;
+}
+
+.led-scroll-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
 }
 
 .led-container {
     position: relative;
     box-sizing: border-box;
     width: 100%;
-    max-width: 1100px;
-    padding: 20px;
     margin: auto;
     height: 100%;
+    overflow-y: auto;
 }
 
 .led-editor,
@@ -31,7 +37,10 @@
     overflow: visible;
     position: relative;
     margin-top: 0;
+    margin: auto;
     margin-bottom: 150px;
+    width: calc(100% - 40px);
+    max-width:1000px;
 }
 .led-flex-editor {
     align-items:start;
@@ -69,17 +78,16 @@
 .led-toolbar {
     outline: 1px solid var(--border-light);
     background: var(--bg);
-    border-radius: 16px;
     box-sizing: border-box;
-    padding: 8px;
+    padding: 12px;
     overflow: visible;
     position: sticky;
-    top: 20px;
-    right: 0;
+    top: 0px;
+    width: 100%;
     margin-bottom: 20px;
     z-index: 900;
     box-sizing: border-box;
-    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.095);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.052);
 }
 
 .led-toolbar-topbar {
@@ -114,9 +122,9 @@
 }
 
 .led-toolbar-button {
-    padding: 0 10px;
-    height: 36px;
-    padding-right: 14px;
+    padding: 0 6px;
+    height: 30px;
+    padding-right: 10px;
     color: gray;
     border-radius: 4px;
     transition: 0.3s all, .1s outline;
@@ -126,9 +134,10 @@
     align-items: center;
     justify-content: center;
     gap: 4px;
+    font-size: 16px;
 }
 .led-toolbar-button i {
-    font-size: 20px;
+    font-size: 18px;
 }
 
 .led-toolbar-button:hover {
@@ -157,8 +166,8 @@
 }
 
 .led-toolbar-block-palette-button {
-    width: 65px;
-    height: 65px;
+    width: 56px;
+    height: 56px;
     display: flex;
     align-items: center;
     justify-content: center;

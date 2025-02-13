@@ -3,7 +3,7 @@
     let { children, data } = $props();
     import  {page} from "$app/state"
     let { supabase } = $derived(data);
-    let closed = $derived(page.url.toString().includes("edit"));
+    let closed = $derived(page.url.toString().includes("edit/"));
 </script>
 
 <div class="admin-root">
@@ -21,7 +21,6 @@
     }
     .admin-main {
         width: calc(100%);
-        background: #ffffff;
         height: 100%;
         overflow: auto;
     }

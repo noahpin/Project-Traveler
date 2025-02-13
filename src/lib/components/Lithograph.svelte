@@ -6,7 +6,7 @@
     import { ImageBlock } from "$lib/layout/blocks/imageBlock";
     import { ContainerBlock } from "$lib/layout/blocks/containerBlock";
 
-    let {lithographData}: {lithographData?: any | null} = $props();
+    let {lithographData, hide}: {lithographData?: any | null, hide?: boolean} = $props();
     
     let holder: HTMLElement;
     let editor: Lithograph;
@@ -14,7 +14,8 @@
         editor = new Lithograph({ 
             data: lithographData,
             container: holder,
-            blockTypes: [TextBlock, DividerBlock, ImageBlock, ContainerBlock]
+            blockTypes: [TextBlock, DividerBlock, ImageBlock, ContainerBlock],
+            enablePreview: false
          });
          
     });
@@ -24,5 +25,5 @@
     }
 </script>
 
-<div class="container" bind:this={holder}>
+<div class="container" class:lithograph-hidden={hide} bind:this={holder}>
 </div>

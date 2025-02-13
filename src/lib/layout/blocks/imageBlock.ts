@@ -1,7 +1,7 @@
 import { Block, Lithograph, type BlockSaveData } from "../lithograph";
 
 export class ImageBlock extends Block {
-	image: string = "https://placecats.com/300/200";
+	image: string = "https://placedog.net/400x200?r";
 	previewElement!: HTMLImageElement;
 	constructor(editor: Lithograph, parent: Block | null) {
 		super(editor, parent);
