@@ -20,7 +20,7 @@ export const entries: EntryGenerator = async () => {
 
 export const load: PageServerLoad = async ({ locals: { supabase, session }, params }) => {
 	let fullPath = params.slug;
-	let query = supabase.from('posts').select("content,title,excerpt,status,page_settings").eq('slug', fullPath);
+	let query = supabase.from('posts').select("id,content,title,excerpt,status,page_settings,publish_date").eq('slug', fullPath);
 	if(!session) {
 		query = query.or('status.eq.published,and(status.eq.scheduled,publish_date.lte.' + new Date().toISOString() + ')');
 	}

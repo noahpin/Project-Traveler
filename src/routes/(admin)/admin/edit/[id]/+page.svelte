@@ -5,7 +5,7 @@
 	import "$lib/layoutEditor.css";
 	import Lithograph from "$lib/components/Lithograph.svelte";
 	import { goto } from "$app/navigation";
-	import { getPage } from "$lib/supabaseHelpers";
+	import { getPage, postSlugValidator } from "$lib/supabaseHelpers";
 	import PageRenderer from "$lib/components/PageRenderer.svelte";
 	import Color from "@tiptap/extension-color";
 	import ColorInput from "$lib/components/ColorInput.svelte";
@@ -13,6 +13,7 @@
 	import { computePosition } from "@floating-ui/core";
 	import { platform, flip, offset, shift } from "@floating-ui/dom";
 	import { createPopper } from "@popperjs/core";
+	import {Toaster, toast} from "svelte-sonner"
 
 	import { onMount } from "svelte";
 	let { data } = $props();
@@ -27,7 +28,7 @@
 		: "";
 	$inspect(page.publish_date);
 	let lithograph;
-	let pageSlugWithoutSelfSlug = page.slug.replace(page.self_slug, "");
+	let pageSlugWithoutSelfSlug = page.slug.replace(new RegExp(page.self_slug + '$'), "");
 	let parentPage: any = $state(null);
 	if (page.parent_id) {
 		checkForParent();
@@ -57,11 +58,17 @@
 	let updatingData = $state(false);
 	async function updateData() {
 		showPublishPopover = false;
+		let valid = await checkForPostPublishValidity();
+		if(!valid) {
+			toast.error("Could not update page as errors are present. Please fix them and try again");
+			return;
+		}
 		let data = lithograph!.getJSON();
 		let pageData = $state.snapshot(page);
 		let timeStart = Date.now();
 		updatingData = true;
 		pageData.content = { content: data };
+		pageData.content.flex = originalPageData.content?.flex ?? false;
 		pageData.page_settings = {
 			disable_navbar: disableNavbar,
 			page_background_color: pageBackgroundColor,
@@ -79,13 +86,6 @@
 		delete diff.post_categories;
 		delete diff.post_tags;
 		console.log(diff);
-		if (diff.publish_date) {
-			diff.publish_date = DateTime.fromISO(diff.publish_date).toISO();
-			if (page.status == "draft") {
-				diff.status = "scheduled";
-				page.status = "scheduled";
-			}
-		}
 		let { data: dat, error } = await supabase
 			.from("posts")
 			.update(diff)
@@ -120,9 +120,25 @@
 		pageRendererData = { content: lithograph!.getJSON(), flex: true }; //TODO: make flex be accurate to what is in the lithograph
 	}
 
-	function publishImmediately() {
-		page.status = "published";
+	async function publishImmediately() {
 		showPublishPopover = false;
+		let valid = await checkForPostPublishValidity();
+		if(!valid) {
+			toast.error("Could not update page as errors are present. Please fix them and try again");
+			return;
+		}
+		page.status = "published";
+		updateData();
+	}
+
+	async function schedulePublish() {
+		showPublishPopover = false;
+		let valid = await checkForPostPublishValidity();
+		if(!valid) {
+			toast.error("Could not update page as errors are present. Please fix them and try again");
+			return;
+		}
+		page.status = "scheduled";
 		updateData();
 	}
 
@@ -155,6 +171,41 @@
 			],
 		});
 	});
+
+	let debounceSlug: NodeJS.Timeout | null = $state(null);
+	let slugError = $state(false);
+	let slugErrorMessage = $state("");
+	let titleError = $state(false);
+	let titleErrorMessage = $state("");
+	
+	async function checkForPostPublishValidity() {
+		if(page.title == "") {
+			titleError = true;
+			titleErrorMessage = "Title is empty. Please enter a title.";
+		}
+		await checkSlugValidity();
+		if(titleError || slugError) {
+			return false;
+		}
+		return true;
+	}
+
+	function deferCheckSlugValidity() {
+		slugError = false;
+		if (debounceSlug) {
+			clearTimeout(debounceSlug);
+		}
+		debounceSlug = setTimeout(checkSlugValidity, 500);
+	}
+	async function checkSlugValidity() {
+		console.log(pageSlugWithoutSelfSlug + page.self_slug);
+		let result = await postSlugValidator( pageSlugWithoutSelfSlug + page.self_slug, supabase, page.id);
+		console.log(result)
+		if(result != "valid") {
+			slugError = true;
+			slugErrorMessage = result.error;
+		}
+	}
 </script>
 
 <svelte:window
@@ -229,7 +280,9 @@
 		</div>
 	</div>
 	<div class="admin-editor">
+		<Toaster position="top-right" offset="10px"  richColors></Toaster>
 		<div class="admin-editor-page-editor">
+
 			<!-- TODO: make it so that this doesnt delete the lithograph or pagerenderer object, and just hides them. maybe destroys pagerenderer but not lithograph so that it doesnt lose data.-->
 			<Lithograph
 				bind:this={lithograph}
@@ -285,7 +338,7 @@
 				</div>
 				<div class="admin-editor-sidebar-section">
 					<h2>Metadata</h2>
-					<div class="admin-editor-metadata-group">
+					<div class="admin-editor-metadata-group" class:admin-editor-metadata-group-error={titleError}>
 						<div class="admin-editor-metadata-label">Title</div>
 						<input
 							type="text"
@@ -293,7 +346,12 @@
 							class="admin-editor-input"
 						/>
 					</div>
-					<div class="admin-editor-metadata-group">
+					{#if titleError}
+					<div class="admin-editor-error">
+						ERR: Title is empty. Please enter a title.
+					</div>
+					{/if}
+					<div class="admin-editor-metadata-group" class:admin-editor-metadata-group-error={slugError}>
 						<div class="admin-editor-metadata-label">Slug</div>
 						<div class="admin-editor-metadata-slug">
 							/{pageSlugWithoutSelfSlug}
@@ -301,9 +359,15 @@
 								class="admin-editor-input"
 								type="text"
 								bind:value={page.self_slug}
+								oninput={(e) => {page.self_slug = page.self_slug.toLowerCase(); deferCheckSlugValidity()}}
 							/>
 						</div>
 					</div>
+					{#if slugError}
+					<div class="admin-editor-error">
+						ERR: {slugErrorMessage}
+					</div>
+					{/if}
 					<div class="admin-editor-metadata-group">
 						<div class="admin-editor-metadata-label">Excerpt</div>
 						<textarea
@@ -398,7 +462,7 @@
 				type="datetime-local"
 			/>
 		</div>
-		<button class="admin-button button-primary" onclick={updateData}
+		<button class="admin-button button-primary" onclick={schedulePublish}
 			>Schedule</button
 		>
 	</div>
@@ -406,6 +470,7 @@
 
 <style>
 	.admin-editor-page-editor {
+		position: relative;
 		width: 100%;
 		overflow-y: auto;
 	}

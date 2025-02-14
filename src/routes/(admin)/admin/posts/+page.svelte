@@ -58,6 +58,10 @@
 			key: "updated_at",
 		},
 		{
+			label: "Scheduled Date",
+			key: "publish_date",
+		},
+		{
 			label: "Status",
 			key: "status",
 		},
@@ -68,10 +72,6 @@
 		{
 			label: "Categories",
 			renderer: categoryList,
-		},
-		{
-			label: "Scheduled Date",
-			key: "publish_date",
 		},
 		{
 			label: "ID",
@@ -151,6 +151,7 @@
 	</div>
 {/snippet}
 
+
 <div class="admin-page-content">
 	<div class="admin-page-header">
 		<div class="admin-buttons">
@@ -189,7 +190,7 @@
 		data={posts}
 		editURL={"/admin/edit/"}
 		bind:selectedRows={selectedRows}
-		columnWidths={"45px 225px 200px 180px 120px 260px 200px 180px 360px"}
+		columnWidths={"45px 225px 200px 180px 280px 120px 260px 200px 360px"}
 	></AdminGrid>
 </div>
 

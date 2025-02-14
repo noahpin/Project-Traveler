@@ -80,6 +80,16 @@
 		</a>
 	</div>
 	<div class="button-wrapper">
+		<a
+			href="/admin/media"
+			class="button-sidebar"
+			class:button-sidebar-active={page.url.pathname === "/admin/media"}
+		>
+			<i class="ti ti-photo"></i>
+			<p>Media</p>
+		</a>
+	</div>
+	<div class="button-wrapper">
 		<button class="button-sidebar">
 			<i class="ti ti-settings"></i>
 			<p>Settings</p>

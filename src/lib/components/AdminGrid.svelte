@@ -84,11 +84,13 @@
 							day: "numeric",
 						})}
 						
-					{:else if field.key == "published_at"}
-						{new Date(data[field.key]).toLocaleDateString("en-US", {
+					{:else if field.key == "publish_date"}
+						{new Date(data[field.key]).toLocaleString("en-US", {
 							year: "numeric",
 							month: "long",
 							day: "numeric",
+							hour: "numeric",
+							minute: "numeric",
 						})}
 					{:else if field.key == "status"}
 						<span class={"admin-grid-status-" + data[field.key]}
