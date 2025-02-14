@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from "$app/state";
 	import { onMount } from "svelte";
-	import type { LayoutProps } from './$types';
+	import type { LayoutProps } from "./$types";
 
 	let data = $derived(page.data);
 	let session = $derived(data.session);
@@ -13,15 +13,21 @@
 	// svelte-ignore state_referenced_locally
 	let pageTextColor = $state(pageSettings?.page_text_color ?? null);
 	// console.log(page.url)
-console.log(layoutData)
+	console.log(layoutData);
 	async function trackPageView() {
+		if (layoutData.deploymentEnvironment != "production") {
+			return;
+		}
 		const url = window.location.pathname;
 		const userAgent = navigator.userAgent;
 
-		const res = fetch('https://api64.ipify.org?format=json')
-			.then(response => response.json())
+		const res = fetch("https://api64.ipify.org?format=json")
+			.then((response) => response.json())
 			.then(({ ip }) => {
-				navigator.sendBeacon('/api/track', JSON.stringify({ url, userAgent, ip }));
+				navigator.sendBeacon(
+					"/api/track",
+					JSON.stringify({ url, userAgent, ip, commitSHA: layoutData.deploymentGitSHA })
+				);
 			});
 	}
 	onMount(trackPageView);
