@@ -35,3 +35,23 @@ export async function postSlugValidator(slug: string, supabase: SupabaseClient, 
 
     return "valid";
 }
+
+/**
+ * Uploads a file to Supabase storage and adds it to the files_metadata table
+ * @param supabase - The Supabase client instance.
+ * @param file - The file to upload.
+ * @param bucket - The name of the storage bucket.
+ * @param path - The path to upload the file to. IMPORTANT! this should NOT include the file name
+ * @param fileName - The name to save the file as.
+ * @returns The response from the Supabase storage upload.
+ */
+export async function uploadFile(supabase: SupabaseClient, file: File, bucket: string, path: string) {
+    let fileURLID = crypto.randomUUID();
+    let fileExtension = file.name.split(".").pop();
+    let fileMetadataName = file.name.split(".").slice(0, -1).join(".");
+    const { data: uploadData, error: uploadError } = await supabase.storage.from(bucket).upload(path + fileURLID + "." + fileExtension, file);
+    if(uploadData == null) return;
+    //now, we insert into the files_metadata table the actual file name
+    const {data: metadataData, error: metadataError} = await supabase.from("files_metadata").insert({name: fileMetadataName, file_path: path + fileURLID + "." + fileExtension, bucket: bucket, file_id: uploadData.id, id: fileURLID});
+}
+

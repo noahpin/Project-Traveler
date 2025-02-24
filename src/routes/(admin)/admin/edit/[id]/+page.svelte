@@ -14,6 +14,7 @@
 	import { platform, flip, offset, shift } from "@floating-ui/dom";
 	import { createPopper } from "@popperjs/core";
 	import {Toaster, toast} from "svelte-sonner"
+	import {copy} from 'svelte-copy';
 
 	import { onMount } from "svelte";
 	let { data } = $props();
@@ -25,7 +26,7 @@
 	console.log(DateTime.fromISO(page.publish_date).toISO());
 	page.publish_date = page.publish_date
 		? DateTime.fromISO(page.publish_date).toISO().slice(0, 16)
-		: "";
+		: null;
 	$inspect(page.publish_date);
 	let lithograph;
 	let pageSlugWithoutSelfSlug = page.slug.replace(new RegExp(page.self_slug + '$'), "");
@@ -288,6 +289,7 @@
 				bind:this={lithograph}
 				hide={previewing}
 				lithographData={page.content}
+				{supabase}
 			/>
 			{#if previewing}
 				<PageRenderer
@@ -309,7 +311,7 @@
 					<h2>Info</h2>
 					<div class="admin-editor-metadata-group">
 						<div class="admin-editor-metadata-label">ID</div>
-						<div class="admin-editor-metadata-id">{page.id}</div>
+						<div class="admin-editor-metadata-id" use:copy={page.id}>{page.id}</div>
 					</div>
 					<div class="admin-editor-metadata-group">
 						<div class="admin-editor-metadata-label">Status</div>

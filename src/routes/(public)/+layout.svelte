@@ -13,7 +13,7 @@
 	// svelte-ignore state_referenced_locally
 	let pageTextColor = $state(pageSettings?.page_text_color ?? null);
 	// console.log(page.url)
-	console.log(layoutData);
+	// console.log(layoutData);
 	async function trackPageView() {
 		if (layoutData.deploymentEnvironment != "production") {
 			return;

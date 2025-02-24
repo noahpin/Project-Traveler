@@ -351,6 +351,8 @@
 
 .led-image-block-preview img {
     display: block;
+    max-width: 100%;
+    max-height: 240px;
 }
 .led-container-block-preview {
     width: 100%;

@@ -58,12 +58,12 @@
 			key: "updated_at",
 		},
 		{
-			label: "Status",
-			key: "status",
-		},
-		{
 			label: "Scheduled Date",
 			key: "publish_date",
+		},
+		{
+			label: "Status",
+			key: "status",
 		},
 		{
 			label: "ID",
@@ -159,6 +159,8 @@
 		data={pages}
 		editURL={"/admin/edit/"}
 		bind:selectedRows={selectedRows}
+
+		columnWidths={"45px 225px 200px 180px 280px 120px 360px"}
 	></AdminGrid>
 </div>
 

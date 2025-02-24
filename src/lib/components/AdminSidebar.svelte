@@ -8,8 +8,7 @@
 
 
     function signOut() {
-        supabase.auth.signOut();
-        goto("/")
+		
     }
 </script>
 

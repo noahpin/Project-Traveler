@@ -8,6 +8,9 @@
 	<title>
 		{page.title}
 	</title>
+	<meta name="description" content={page.excerpt} />
+	<meta property="og:title" content={page.title} />
+	<meta property="og:description" content={page.excerpt} />
 </svelte:head>
 
 {#if page}
