@@ -20,13 +20,11 @@ export const entries: EntryGenerator = async () => {
 
 export const load: PageServerLoad = async ({ locals: { supabase, session }, params }) => {
 	let fullPath = params.slug;
-	console.log(fullPath)
 	let query = supabase.from('posts').select("id,content,title,excerpt,status,page_settings,publish_date").eq('slug', fullPath);
 	if(!session) {
 		query = query.or('status.eq.published,and(status.eq.scheduled,publish_date.lte.' + new Date().toISOString() + ')');
 	}
 	const { data: page, error: err } = await query.single();
-	console.log(page, err)
 	if(!page) {
 		error(404, 'Not found');
 	}

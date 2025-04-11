@@ -1,5 +1,6 @@
 <script lang="ts">
 	import moment from "moment";
+
 	//@ts-ignore
 	import { DateTime } from "luxon";
 	import "$lib/layoutEditor.css";
@@ -13,23 +14,30 @@
 	import { computePosition } from "@floating-ui/core";
 	import { platform, flip, offset, shift } from "@floating-ui/dom";
 	import { createPopper } from "@popperjs/core";
-	import {Toaster, toast} from "svelte-sonner"
-	import {copy} from 'svelte-copy';
+	import { Toaster, toast } from "svelte-sonner";
+	import { copy } from "svelte-copy";
 
-	import { onMount } from "svelte";
+	import { onDestroy, onMount } from "svelte";
+	import AdminTaxonomyInput from "$lib/components/AdminTaxonomyInput.svelte";
+	import MonacoEditor from "$lib/components/MonacoEditor.svelte";
 	let { data } = $props();
 	let { page: originalPageData, supabase } = $derived(data);
 	// svelte-ignore state_referenced_locally
 	// svelte-ignore state_referenced_locally
 	let page = $state(originalPageData);
-	//make this local
-	console.log(DateTime.fromISO(page.publish_date).toISO());
+	let pageCategories: {name: string, id: string}[] = $state(page.post_categories.map((category: { category: { name: any; id: any; }; }) => {return {name: category.category.name, id: category.category.id}}));
+	let pageTags: {name: string, id: string}[] = $state(page.post_tags.map((tag: { tag: { name: any; id: any; }; }) => {return {name: tag.tag.name, id: tag.tag.id}}));
+	$inspect(pageCategories)
+	$inspect(pageTags)
 	page.publish_date = page.publish_date
 		? DateTime.fromISO(page.publish_date).toISO().slice(0, 16)
 		: null;
-	$inspect(page.publish_date);
+	$inspect(page);
 	let lithograph;
-	let pageSlugWithoutSelfSlug = page.slug.replace(new RegExp(page.self_slug + '$'), "");
+	let pageSlugWithoutSelfSlug = page.slug.replace(
+		new RegExp(page.self_slug + "$"),
+		""
+	);
 	let parentPage: any = $state(null);
 	if (page.parent_id) {
 		checkForParent();
@@ -43,25 +51,20 @@
 
 	let pageSettings: {
 		disable_navbar: boolean;
-		page_background_color: string;
-		page_text_color: string;
-	} = $derived(page.page_settings);
+		css: string;
+	} = $state(page.page_settings);
 
-	// svelte-ignore state_referenced_locally
 	let disableNavbar = $state(pageSettings?.disable_navbar ?? false);
-	// svelte-ignore state_referenced_locally
-	let pageBackgroundColor = $state(
-		pageSettings?.page_background_color ?? "#ffffff"
-	);
-	// svelte-ignore state_referenced_locally
-	let pageTextColor = $state(pageSettings?.page_text_color ?? "#000000");
+	let pageCSS = $state(pageSettings?.css ?? "");
 
 	let updatingData = $state(false);
 	async function updateData() {
 		showPublishPopover = false;
 		let valid = await checkForPostPublishValidity();
-		if(!valid) {
-			toast.error("Could not update page as errors are present. Please fix them and try again");
+		if (!valid) {
+			toast.error(
+				"Could not update page as errors are present. Please fix them and try again"
+			);
 			return;
 		}
 		let data = lithograph!.getJSON();
@@ -72,8 +75,7 @@
 		pageData.content.flex = originalPageData.content?.flex ?? false;
 		pageData.page_settings = {
 			disable_navbar: disableNavbar,
-			page_background_color: pageBackgroundColor,
-			page_text_color: pageTextColor,
+			css: pageCSS,
 		};
 		let diff = Object.keys(pageData).reduce(
 			(acc: { [key: string]: any }, key) => {
@@ -91,10 +93,41 @@
 			.from("posts")
 			.update(diff)
 			.eq("id", page.id);
+
+		//now, we need to delete all of the post-category and post-tag relations and then recreate them, with the new relations.
+		let {data: dataCategoryDelete, error: errorCategoryDelete} = await supabase
+			.from("post_categories")
+			.delete()
+			.eq("post_id", page.id);
+		let {data: dataTagDelete, error: errorTagDelete} = await supabase
+			.from("post_tags")
+			.delete()
+			.eq("post_id", page.id);
+
+		//now reinsert! :(
+		let {data: dataCategoryInsert, error: errorCategoryInsert} = await supabase
+			.from("post_categories")
+			.insert(pageCategories.map((category) => {
+				return {
+					post_id: page.id,
+					category_id: category.id
+				}
+			}));
+		let {data: dataTagInsert, error: errorTagInsert} = await supabase
+			.from("post_tags")
+			.insert(pageTags.map((tag) => {
+				return {
+					post_id: page.id,
+					tag_id: tag.id
+				}
+			}));
+
 		if (error) {
 			console.error(error);
+			toast.error("Error updating page: " + error.message);
 		} else {
 			console.log(dat);
+			toast.success(`${page.post_type.charAt(0).toUpperCase() + page.post_type.slice(1)} updated successfully`);
 		}
 
 		let timeEnd = Date.now();
@@ -124,8 +157,10 @@
 	async function publishImmediately() {
 		showPublishPopover = false;
 		let valid = await checkForPostPublishValidity();
-		if(!valid) {
-			toast.error("Could not update page as errors are present. Please fix them and try again");
+		if (!valid) {
+			toast.error(
+				"Could not update page as errors are present. Please fix them and try again"
+			);
 			return;
 		}
 		page.status = "published";
@@ -135,8 +170,10 @@
 	async function schedulePublish() {
 		showPublishPopover = false;
 		let valid = await checkForPostPublishValidity();
-		if(!valid) {
-			toast.error("Could not update page as errors are present. Please fix them and try again");
+		if (!valid) {
+			toast.error(
+				"Could not update page as errors are present. Please fix them and try again"
+			);
 			return;
 		}
 		page.status = "scheduled";
@@ -152,8 +189,7 @@
 			showScheduleUI = false;
 		}
 	});
-	onMount(() => {
-		console.log(publishButton, publishPopover);
+	onMount(async () => {
 		createPopper(publishButton!, publishPopover, {
 			placement: "bottom",
 			modifiers: [
@@ -178,14 +214,15 @@
 	let slugErrorMessage = $state("");
 	let titleError = $state(false);
 	let titleErrorMessage = $state("");
-	
+
+
 	async function checkForPostPublishValidity() {
-		if(page.title == "") {
+		if (page.title == "") {
 			titleError = true;
 			titleErrorMessage = "Title is empty. Please enter a title.";
 		}
 		await checkSlugValidity();
-		if(titleError || slugError) {
+		if (titleError || slugError) {
 			return false;
 		}
 		return true;
@@ -200,9 +237,13 @@
 	}
 	async function checkSlugValidity() {
 		console.log(pageSlugWithoutSelfSlug + page.self_slug);
-		let result = await postSlugValidator( pageSlugWithoutSelfSlug + page.self_slug, supabase, page.id);
-		console.log(result)
-		if(result != "valid") {
+		let result = await postSlugValidator(
+			pageSlugWithoutSelfSlug + page.self_slug,
+			supabase,
+			page.id
+		);
+		console.log(result);
+		if (result != "valid") {
 			slugError = true;
 			slugErrorMessage = result.error;
 		}
@@ -281,10 +322,23 @@
 		</div>
 	</div>
 	<div class="admin-editor">
-		<Toaster position="top-right" offset="10px"  richColors></Toaster>
+		<Toaster position="top-right" offset="10px" richColors></Toaster>
+		
+		<div
+			class="admin-editor-css-sidebar admin-editor-sidebar"
+			class:admin-editor-sidebar-collapsed={!previewing}
+		>
+			<div class="admin-editor-css-sidebar-inner admin-editor-sidebar-inner">
+				<div class="admin-editor-sidebar-section" style:height="100%">
+					<h2>Edit CSS</h2>
+					<MonacoEditor
+						bind:value={pageCSS}
+						language="css"
+						></MonacoEditor>
+				</div>
+			</div>
+		</div>
 		<div class="admin-editor-page-editor">
-
-			<!-- TODO: make it so that this doesnt delete the lithograph or pagerenderer object, and just hides them. maybe destroys pagerenderer but not lithograph so that it doesnt lose data.-->
 			<Lithograph
 				bind:this={lithograph}
 				hide={previewing}
@@ -292,26 +346,27 @@
 				{supabase}
 			/>
 			{#if previewing}
+			{@html "<style>" + pageCSS + "</style>"}
 				<PageRenderer
 					content={pageRendererData}
-					overrides={{
-						backgroundColor: pageBackgroundColor,
-						bodyTextColor: pageTextColor,
-					}}
+					injectCSS={false}
+					settings={pageSettings}
 				></PageRenderer>
 			{/if}
 		</div>
 
 		<div
-			class="admin-editor-metadata-sidebar"
-			class:admin-editor-metadata-sidebar-collapsed={previewing}
+			class="admin-editor-metadata-sidebar admin-editor-sidebar"
+			class:admin-editor-sidebar-collapsed={previewing}
 		>
-			<div class="admin-editor-metadata-sidebar-inner">
+			<div class="admin-editor-metadata-sidebar-inner admin-editor-sidebar-inner">
 				<div class="admin-editor-sidebar-section">
 					<h2>Info</h2>
 					<div class="admin-editor-metadata-group">
 						<div class="admin-editor-metadata-label">ID</div>
-						<div class="admin-editor-metadata-id" use:copy={page.id}>{page.id}</div>
+						<div class="admin-editor-metadata-id" use:copy={page.id}>
+							{page.id}
+						</div>
 					</div>
 					<div class="admin-editor-metadata-group">
 						<div class="admin-editor-metadata-label">Status</div>
@@ -327,7 +382,9 @@
 							}}
 						>
 							{page.publish_date == "" || page.publish_date == null
-								? page.post_type.charAt(0).toUpperCase() + page.post_type.slice(1) + " is not scheduled."
+								? page.post_type.charAt(0).toUpperCase() +
+									page.post_type.slice(1) +
+									" is not scheduled."
 								: moment.utc(page.publish_date).format("MMMM Do YYYY, h:mm a")}
 							<i class="ti ti-pencil"></i>
 							<input
@@ -340,7 +397,10 @@
 				</div>
 				<div class="admin-editor-sidebar-section">
 					<h2>Metadata</h2>
-					<div class="admin-editor-metadata-group" class:admin-editor-metadata-group-error={titleError}>
+					<div
+						class="admin-editor-metadata-group"
+						class:admin-editor-metadata-group-error={titleError}
+					>
 						<div class="admin-editor-metadata-label">Title</div>
 						<input
 							type="text"
@@ -349,11 +409,14 @@
 						/>
 					</div>
 					{#if titleError}
-					<div class="admin-editor-error">
-						ERR: Title is empty. Please enter a title.
-					</div>
+						<div class="admin-editor-error">
+							ERR: Title is empty. Please enter a title.
+						</div>
 					{/if}
-					<div class="admin-editor-metadata-group" class:admin-editor-metadata-group-error={slugError}>
+					<div
+						class="admin-editor-metadata-group"
+						class:admin-editor-metadata-group-error={slugError}
+					>
 						<div class="admin-editor-metadata-label">Slug</div>
 						<div class="admin-editor-metadata-slug">
 							/{pageSlugWithoutSelfSlug}
@@ -361,14 +424,17 @@
 								class="admin-editor-input"
 								type="text"
 								bind:value={page.self_slug}
-								oninput={(e) => {page.self_slug = page.self_slug.toLowerCase(); deferCheckSlugValidity()}}
+								oninput={(e) => {
+									page.self_slug = page.self_slug.toLowerCase();
+									deferCheckSlugValidity();
+								}}
 							/>
 						</div>
 					</div>
 					{#if slugError}
-					<div class="admin-editor-error">
-						ERR: {slugErrorMessage}
-					</div>
+						<div class="admin-editor-error">
+							ERR: {slugErrorMessage}
+						</div>
 					{/if}
 					<div class="admin-editor-metadata-group">
 						<div class="admin-editor-metadata-label">Excerpt</div>
@@ -377,53 +443,36 @@
 							bind:value={page.excerpt}
 						></textarea>
 					</div>
-					<div class="admin-editor-metadata-group">
-						<div class="admin-editor-metadata-label">Parent Page</div>
-						{#if parentPage}
-							<input
-								type="text"
-								bind:value={parentPage.title}
-								disabled
-								class="admin-editor-input"
-							/>
-						{:else}
-							<input
-								type="text"
-								value={""}
-								disabled
-								class="admin-editor-input"
-							/>
-						{/if}
-					</div>
-					<div class="admin-editor-metadata-group">
-						<div class="admin-editor-metadata-label">Categories</div>
-						<input type="text" value={""} disabled class="admin-editor-input" />
-					</div>
-					<div class="admin-editor-metadata-group">
-						<div class="admin-editor-metadata-label">Tags</div>
-						<input type="text" value={""} disabled class="admin-editor-input" />
-					</div>
-				</div>
-				<div class="admin-editor-sidebar-section">
-					<h2>Settings</h2>
-					<div
-						class="admin-editor-metadata-group admin-editor-metadata-group-horizontal"
-					>
-						<div class="admin-editor-metadata-label">Disable Navbar</div>
-						<CheckboxInput bind:value={disableNavbar} />
-					</div>
-					<div
-						class="admin-editor-metadata-group admin-editor-metadata-group-horizontal"
-					>
-						<div class="admin-editor-metadata-label">Page Background Color</div>
-						<ColorInput bind:color={pageBackgroundColor} />
-					</div>
-					<div
-						class="admin-editor-metadata-group admin-editor-metadata-group-horizontal"
-					>
-						<div class="admin-editor-metadata-label">Page Text Color</div>
-						<ColorInput bind:color={pageTextColor} />
-					</div>
+					{#if page.post_type == "page"}
+						<div class="admin-editor-metadata-group">
+							<div class="admin-editor-metadata-label">Parent Page</div>
+							{#if parentPage}
+								<input
+									type="text"
+									bind:value={parentPage.title}
+									disabled
+									class="admin-editor-input"
+								/>
+							{:else}
+								<input
+									type="text"
+									value={""}
+									disabled
+									class="admin-editor-input"
+								/>
+							{/if}
+						</div>
+					{:else}
+						<div class="admin-editor-metadata-group">
+							<div class="admin-editor-metadata-label">Categories</div>
+							
+							<AdminTaxonomyInput {supabase} bind:taxonomies={pageCategories} table="categories"></AdminTaxonomyInput>
+						</div>
+						<div class="admin-editor-metadata-group">
+							<div class="admin-editor-metadata-label">Tags</div>
+							<AdminTaxonomyInput {supabase} bind:taxonomies={pageTags} table="tags"></AdminTaxonomyInput>
+						</div>
+					{/if}
 				</div>
 			</div>
 		</div>
@@ -435,7 +484,10 @@
 	bind:this={publishPopover}
 	class:admin-editor-popover-show={showPublishPopover}
 >
-	<div class:display-none={showScheduleUI} class:display-contents={!showScheduleUI}>
+	<div
+		class:display-none={showScheduleUI}
+		class:display-contents={!showScheduleUI}
+	>
 		<button class="admin-button button-sub" onclick={publishImmediately}
 			>Publish Immediately</button
 		>
@@ -447,7 +499,10 @@
 		>
 	</div>
 
-	<div class:display-none={!showScheduleUI} class:display-contents={showScheduleUI}>
+	<div
+		class:display-none={!showScheduleUI}
+		class:display-contents={showScheduleUI}
+	>
 		<div
 			role="presentation"
 			class={"admin-editor-metadata-date"}

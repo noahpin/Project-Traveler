@@ -77,6 +77,7 @@
 			.insert([{ post_type: "page" }])
 			.select()
 			.single();
+			console.log(error)
 		goto(`/admin/edit/${data.id}`);
 	}
 

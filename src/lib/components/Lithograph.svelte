@@ -28,6 +28,7 @@
 			blockTypes: [TextBlock, DividerBlock, BlossomImageBlock, ContainerBlock],
 			enablePreview: false,
 		});
+		editor.enableFlex();
 	});
 
 	export function getJSON() {

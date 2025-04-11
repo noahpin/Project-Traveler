@@ -1,7 +1,6 @@
 <script>
 	import { invalidate } from "$app/navigation";
 	import { onMount } from "svelte";
-
 	import "$lib/app.css"
 	import "$lib/admin.css"
 
@@ -14,9 +13,9 @@
 				invalidate("supabase:auth");
 			}
 		});
-
 		return () => data.subscription.unsubscribe();
 	});
+	
 </script>
 
 {@render children()}

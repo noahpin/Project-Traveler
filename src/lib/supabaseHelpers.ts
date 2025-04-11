@@ -13,7 +13,7 @@ export async function getPage(supabase: SupabaseClient, id: string) {
 }
 
 export async function postSlugValidator(slug: string, supabase: SupabaseClient, selfId?: string): Promise<{error: string} | "valid"> {
-    const regex = /^[a-z0-9_/-]*$/;
+    const regex = /^[a-zA-Z0-9_/-]*$/;
     var regtext =  regex.test(slug);
     if(!regtext) {
         return {error: "Invalid slug. Slugs can only use the characters a-z, 0-9, -, and _."}

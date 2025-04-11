@@ -13,6 +13,6 @@
 	<meta property="og:description" content={page.excerpt} />
 </svelte:head>
 
-{#if page}
-		<PageRenderer content={data.page.content}></PageRenderer>
+{#if page && data.page.content && data.page.page_settings}
+		<PageRenderer content={data.page.content} settings={data.page.page_settings}></PageRenderer>
 {/if}

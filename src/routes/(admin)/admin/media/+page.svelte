@@ -9,7 +9,4 @@
 	let { session, supabase } = data;
 	let selectedItem: any= $state(null);
 </script>
-{#snippet actionBarContent()}
-	select item :3
-{/snippet}
-<MediaLibrary {supabase} bind:selectedItem {actionBarContent}></MediaLibrary>
+<MediaLibrary {supabase} bind:selectedItem></MediaLibrary>

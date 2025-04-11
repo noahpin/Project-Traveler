@@ -8,12 +8,6 @@
 	let pageData = $derived(data.page);
 	let { children, data: layoutData } = $props();
 	let pageSettings = $derived(pageData?.page_settings);
-	// svelte-ignore state_referenced_locally
-	let pageBackgroundColor = $state(pageSettings?.page_background_color ?? null);
-	// svelte-ignore state_referenced_locally
-	let pageTextColor = $state(pageSettings?.page_text_color ?? null);
-	// console.log(page.url)
-	// console.log(layoutData);
 	async function trackPageView() {
 		if (layoutData.deploymentEnvironment != "production") {
 			return;
@@ -35,8 +29,6 @@
 
 <main
 	class="page-root"
-	style:background={pageBackgroundColor}
-	style:color={pageTextColor}
 >
 	<header class="main-header">
 		{#if session}

@@ -4,15 +4,15 @@ export class ContainerBlock extends Block {
     size: {numerator: number, denominator: number} = {numerator: 1, denominator: 1};
     static sizes: {numerator: number, denominator: number}[] = [
         {numerator: 1, denominator: 1},
-        {numerator: 1, denominator: 2},
-        {numerator: 1, denominator: 3},
-        {numerator: 2, denominator: 3},
-        {numerator: 1, denominator: 4},
-        {numerator: 3, denominator: 4},
-        {numerator: 1, denominator: 5},
-        {numerator: 2, denominator: 5},
-        {numerator: 3, denominator: 5},
         {numerator: 4, denominator: 5},
+        {numerator: 3, denominator: 4},
+        {numerator: 2, denominator: 3},
+        {numerator: 3, denominator: 5},
+        {numerator: 1, denominator: 2},
+        {numerator: 2, denominator: 5},
+        {numerator: 1, denominator: 3},
+        {numerator: 1, denominator: 4},
+        {numerator: 1, denominator: 5},
     ]
     sizePreview!: HTMLElement;
     constructor(editor: Lithograph, parent: Block | null) {
@@ -81,7 +81,7 @@ export class ContainerBlock extends Block {
 
     incrementSize(decrement: boolean = false) {
         let index = ContainerBlock.sizes.findIndex((s) => s.numerator == this.size.numerator && s.denominator == this.size.denominator);
-        index += decrement ? -1 : 1;
+        index += decrement ? 1 : -1;
         if(index < 0 ) index+= ContainerBlock.sizes.length;
         if(index >= ContainerBlock.sizes.length) index-= ContainerBlock.sizes.length;
         this.size = ContainerBlock.sizes[index];

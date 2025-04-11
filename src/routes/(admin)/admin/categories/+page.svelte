@@ -215,7 +215,7 @@
 				{displayFields}
 				data={categories}
 				callback={openCategory}
-				columnWidths={"45px 200px 200px 1fr"}
+				columnWidths={"45px 300px 250px 1fr"}
 				bind:selectedRows={selectedRows}
 			></AdminGrid>
 		</div>

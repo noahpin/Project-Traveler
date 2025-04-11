@@ -308,17 +308,26 @@ a {
     display: flex;
     justify-content: center;
 }
-.admin-editor-metadata-sidebar {
+.admin-editor-sidebar {
     width: 280px;
     height: 100%;
     overflow: hidden;
     flex-shrink: 0;
-    /* transition: 0.2s width; */
 }
-.admin-editor-metadata-sidebar-collapsed {
+.admin-editor-css-sidebar {
+    width: 480px;
+}
+
+.admin-editor-monaco {
+    height: 100%;
+    overscroll-behavior: none;
+    touch-action: manipulation;
+    border: 1px solid rgba(0, 0, 0, 0.094);
+}
+.admin-editor-sidebar-collapsed {
     width: 0px;
 }
-.admin-editor-metadata-sidebar-inner {
+.admin-editor-sidebar-inner {
     width: 280px;
     height: 100%;
     background: white;
@@ -335,6 +344,10 @@ a {
     overflow-y: auto;
     padding-bottom: 100px;
 }
+.admin-editor-css-sidebar-inner {
+    width: 480px !important;
+    border-right: 1px solid rgba(0, 0, 0, 0.094);
+}
 
 .admin-editor-sidebar-section {
     display: flex;
@@ -344,7 +357,7 @@ a {
 
 }
 
-.admin-editor-metadata-sidebar-inner h2, .admin-editor-column h2 {
+.admin-editor-sidebar-inner h2, .admin-editor-column h2 {
     font-size: 18px;
     font-weight: 500;
     margin: 0;
@@ -429,6 +442,15 @@ a {
     font-family: "Geist";
     transition: 0.05s border, 0.05s outline;
     max-width: 250px;
+}
+
+.admin-editor-chip-input {
+    height: 36px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: nowrap;
+    align-items: center;
+    overflow: hidden;
 }
 
 .admin-editor-input:hover, .admin-editor-metadata-textarea:hover {
@@ -572,8 +594,8 @@ a {
     display: grid;
     grid-auto-rows: max-content;
     grid-template-columns: 45px 225px 200px 180px 120px 180px 360px 1fr;
-    padding-bottom: 100px;
     box-sizing: border-box;
+    padding-bottom: 100px;
 }
 .admin-grid-row {
     display: contents;
@@ -614,7 +636,7 @@ a {
 
 .admin-grid-status-draft, .admin-grid-status-published, .admin-grid-status-scheduled {
     padding: 5px 10px;
-    border-radius: 100px;
+    border-radius: 4px;
     font-size: 12px;
     text-transform: uppercase;
     display: inline-block;
@@ -673,7 +695,7 @@ a {
 
 .admin-chip {
     padding: 5px 10px;
-    border-radius: 100px;
+    border-radius: 4px;
     font-size: 12px;
     text-transform: uppercase;
     display: inline-block;
@@ -878,6 +900,7 @@ a {
     height: 100%;
     flex-shrink: 1;
     overflow: auto;
+    box-sizing: border-box;
 }
 
 .admin-editor-popover {
@@ -886,7 +909,7 @@ a {
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 16px;
     padding: 8px;
-    z-index: 100;
+    z-index: 1000;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 220px;
     display: flex;

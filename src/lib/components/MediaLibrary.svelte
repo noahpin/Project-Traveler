@@ -25,8 +25,7 @@
 			.from("files_metadata")
 			.select("*")
 			.order("created_at", { ascending: false })
-			.limit(50)
-			.range(page * 50, (page + 1) * 50);
+			.range(page * 50, ((page + 1) * 50) - 1);
 		if (searchQuery != "") {
 			query.ilike("name", `%${searchQuery}%`);
 		}
@@ -213,6 +212,9 @@
 </div>
 
 <style>
+	.admin-editor-fullwidth {
+		padding-bottom: 100px;
+	}
 	.admin-media-gallery {
 		width: 100%;
 		display: grid;
