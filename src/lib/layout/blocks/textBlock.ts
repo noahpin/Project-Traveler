@@ -29,6 +29,11 @@ import { NodeSelection } from "@tiptap/pm/state";
 import { computePosition, offset } from "@floating-ui/core";
 import { platform } from "@floating-ui/dom";
 
+
+type TextBlockSaveData = {
+    content: string;
+}
+
 export class TextBlock extends Block {
 	textEditor!: Editor;
     editorContainer!: HTMLElement;
@@ -301,9 +306,10 @@ export class TextBlock extends Block {
     render() {
         return `<div class="lpv-text">${this.textEditor.getHTML()}</div>`;
     }
-    save(): BlockSaveData {
+    save(): BlockSaveData<TextBlockSaveData> {
         return {
             type: "text",
+            id: this.id,
             data: {
                 content: this.textEditor.getHTML(),
             },

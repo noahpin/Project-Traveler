@@ -17,13 +17,14 @@ type BlockPositionContext = {
 };
 
 type LithographData = {
-	content: BlockSaveData[];
+	content: BlockSaveData<any>[];
 	flex: boolean;
 };
 
-export type BlockSaveData = {
+export type BlockSaveData<T> = {
 	type: string;
-	data: any;
+	id: string;
+	data: T;
 };
 export class Lithograph {
 	container: HTMLElement;
@@ -362,7 +363,7 @@ export class Lithograph {
 
 	createBlockWithSaveData(
 		blockType: new (editor: Lithograph, parent: Block | null) => Block,
-		data: BlockSaveData,
+		data: BlockSaveData<any>,
 		position: BlockPositionContext | null = null
 	) {
 		let block = new blockType(this, null);
@@ -897,7 +898,7 @@ export class Lithograph {
 	}
 
 	getJSON() {
-		let json: BlockSaveData[] = [];
+		let json: BlockSaveData<any>[] = [];
 		this.childBlocks.forEach((block) => {
 			json.push(block.save());
 		});
@@ -932,6 +933,7 @@ export class Lithograph {
 }
 
 export class Block {
+	id: string = crypto.randomUUID();
 	editor: Lithograph;
 	parent: Block | Lithograph;
 	parentElement: HTMLElement;
@@ -1244,9 +1246,10 @@ export class Block {
 		}
 	}
 
-	save(): BlockSaveData {
+	save(): BlockSaveData<any> {
 		return {
 			type: "blank",
+			id: "NO_ID",
 			data: {},
 		};
 	}

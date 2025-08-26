@@ -28,5 +28,46 @@ export const load: PageServerLoad = async ({ locals: { supabase, session }, para
 	if(!page) {
 		error(404, 'Not found');
 	}
-	return { page, error: err }
+	//deep search through page.content to find all post blocks
+	let containers = [];
+	let foundPostBlocks: any[] = [];
+	const findPostBlocks = (content: any) => {
+		if (Array.isArray(content)) {
+			content.forEach((item) => findPostBlocks(item));
+		} else if (typeof content === 'object' && content !== null) {
+			if (content.type === 'post') {
+				foundPostBlocks.push(content);
+			} else if (content.data.children) {
+				findPostBlocks(content.data.children);
+			}
+		}
+	}
+	findPostBlocks(page.content.content);
+	let postBlockQueryResults: {id: string, posts: any[]}[] = foundPostBlocks.map((block) => {return {id: block.id, posts: []}});
+	console.log('Found Post Blocks:', foundPostBlocks);
+	for (let i = 0; i < foundPostBlocks.length; i++) {
+		let blockQueryData = foundPostBlocks[i].data; 
+		let supabaseQuery = supabase.from('posts')
+			.select("*,post_tags(tag:tags(*)),post_categories(category:categories(*))")
+			.eq("post_type", "post")
+			.eq("status", "published")
+			.range(blockQueryData.offset, blockQueryData.offset + blockQueryData.limit - 1);
+		let { data: posts, error: postError } = await supabaseQuery;
+		if (postError) {
+			console.error('Error fetching posts for block:', postError);
+			continue; // Skip this block if there's an error
+		}
+		console.log('Fetched posts for block:', blockQueryData.id, posts);
+		if (posts) {
+			// Filter out posts that are not published or scheduled for future
+			posts = posts.filter(post => post.status === 'published' || (post.status === 'scheduled' && moment(post.publish_date).isSameOrBefore(moment())));
+			postBlockQueryResults[i].posts = posts;
+		} else {
+			console.warn('No posts found for block:', blockQueryData.id);
+		}
+		
+	}
+	console.log('Post Block Query Results:', postBlockQueryResults);
+
+	return { page, postBlockData: postBlockQueryResults, error: err }
 };

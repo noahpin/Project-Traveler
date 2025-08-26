@@ -1,6 +1,6 @@
 <script lang="ts">
 	import moment from "moment";
-
+	import MediaLibrary from "$lib/components/MediaLibrary.svelte";
 	//@ts-ignore
 	import { DateTime } from "luxon";
 	import "$lib/layoutEditor.css";
@@ -20,6 +20,7 @@
 	import { onDestroy, onMount } from "svelte";
 	import AdminTaxonomyInput from "$lib/components/AdminTaxonomyInput.svelte";
 	import MonacoEditor from "$lib/components/MonacoEditor.svelte";
+	import { fade } from "svelte/transition";
 	let { data } = $props();
 	let { page: originalPageData, supabase } = $derived(data);
 	// svelte-ignore state_referenced_locally
@@ -27,12 +28,9 @@
 	let page = $state(originalPageData);
 	let pageCategories: {name: string, id: string}[] = $state(page.post_categories.map((category: { category: { name: any; id: any; }; }) => {return {name: category.category.name, id: category.category.id}}));
 	let pageTags: {name: string, id: string}[] = $state(page.post_tags.map((tag: { tag: { name: any; id: any; }; }) => {return {name: tag.tag.name, id: tag.tag.id}}));
-	$inspect(pageCategories)
-	$inspect(pageTags)
 	page.publish_date = page.publish_date
 		? DateTime.fromISO(page.publish_date).toISO().slice(0, 16)
 		: null;
-	$inspect(page);
 	let lithograph;
 	let pageSlugWithoutSelfSlug = page.slug.replace(
 		new RegExp(page.self_slug + "$"),
@@ -46,7 +44,6 @@
 	async function checkForParent() {
 		const { page: pg, error } = await getPage(supabase, page.parent_id);
 		parentPage = pg;
-		console.log(parentPage);
 	}
 
 	let pageSettings: {
@@ -88,7 +85,6 @@
 		);
 		delete diff.post_categories;
 		delete diff.post_tags;
-		console.log(diff);
 		let { data: dat, error } = await supabase
 			.from("posts")
 			.update(diff)
@@ -126,7 +122,6 @@
 			console.error(error);
 			toast.error("Error updating page: " + error.message);
 		} else {
-			console.log(dat);
 			toast.success(`${page.post_type.charAt(0).toUpperCase() + page.post_type.slice(1)} updated successfully`);
 		}
 
@@ -144,10 +139,19 @@
 		content: any[];
 		flex: boolean | null;
 	} = $state({ content: [], flex: false });
-	$inspect(page);
 
 	let scheduledDatePicker: HTMLInputElement;
 	let scheduledDatePickerSecondary: HTMLInputElement;
+
+	let mediaLibraryOpen = $state(false);
+	let selectedItem: any = $state(null);
+	function onMediaConfirm() {
+		mediaLibraryOpen = false;
+		if (selectedItem) {
+			page.featured_image = selectedItem.url;
+		}
+	}
+	
 	//TODO: make this reversible
 	function preview() {
 		previewing = true;
@@ -236,13 +240,11 @@
 		debounceSlug = setTimeout(checkSlugValidity, 500);
 	}
 	async function checkSlugValidity() {
-		console.log(pageSlugWithoutSelfSlug + page.self_slug);
 		let result = await postSlugValidator(
 			pageSlugWithoutSelfSlug + page.self_slug,
 			supabase,
 			page.id
 		);
-		console.log(result);
 		if (result != "valid") {
 			slugError = true;
 			slugErrorMessage = result.error;
@@ -473,6 +475,21 @@
 							<AdminTaxonomyInput {supabase} bind:taxonomies={pageTags} table="tags"></AdminTaxonomyInput>
 						</div>
 					{/if}
+					<div class="admin-editor-metadata-group">
+						<div class="admin-editor-metadata-label">Featured Image</div>
+						<button onclick={()=>mediaLibraryOpen=true} class="admin-editor-metadata-featured-image">
+							{#if page.featured_image && page.featured_image != ""}
+							<img
+								src={page.featured_image}
+								alt=""
+								class="admin-editor-metadata-featured-image-preview"
+							/>
+							{/if}
+								<div class="admin-editor-metadata-featured-image-button" class:admin-editor-metadata-featured-image-button-exist={page.featured_image != "" && page.featured_image != null}>
+									Select Image
+								</div>
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -524,6 +541,24 @@
 		>
 	</div>
 </div>
+
+
+{#snippet mediaLibraryConfirmButton()}
+	<button class="admin-button" onclick={onMediaConfirm}>Select</button>
+{/snippet}
+
+{#if mediaLibraryOpen}
+	<div class="admin-modal" transition:fade={{ duration: 20 }}>
+		<div class="admin-modal-content">
+			<MediaLibrary
+				{supabase}
+				bind:selectedItem
+				actionBarContent={mediaLibraryConfirmButton}
+			></MediaLibrary>
+		</div>
+	</div>
+{/if}
+
 
 <style>
 	.admin-editor-page-editor {

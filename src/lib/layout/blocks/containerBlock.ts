@@ -1,5 +1,10 @@
 import { Block, Lithograph, type BlockSaveData } from "../lithograph";
 
+type ContainerBlockSaveData = {
+    size: {numerator: number, denominator: number},
+    children: BlockSaveData<any>[]
+}
+
 export class ContainerBlock extends Block {
     size: {numerator: number, denominator: number} = {numerator: 1, denominator: 1};
     static sizes: {numerator: number, denominator: number}[] = [
@@ -32,7 +37,7 @@ export class ContainerBlock extends Block {
     setData(data: any) {
         this.size = data.size;
         this.configure(this.size);
-        data.children.forEach((childData: BlockSaveData) => {
+        data.children.forEach((childData: BlockSaveData<any>) => {
             let block = this.editor.createBlockWithSaveData(this.editor.getBlockByNameString(childData.type)!, childData, {parent: this, insertBefore: null});
         });
     }
@@ -109,9 +114,10 @@ export class ContainerBlock extends Block {
         });
         return `<div class="lpv-container" style="width: calc(${this.size.numerator}/${this.size.denominator} * 100%);">${content}</div>`;
     }
-    save(): BlockSaveData {
+    save(): BlockSaveData<ContainerBlockSaveData> {
         return {
             type: "container",
+			id: this.id,
             data: {
                 size: this.size,
                 children: this.childBlocks.map((child) => child.save()),

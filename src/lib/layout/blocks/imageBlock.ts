@@ -1,5 +1,9 @@
 import { Block, Lithograph, type BlockSaveData } from "../lithograph";
 
+export type ImageBlockSaveData = {
+	url: string;
+}
+
 export class ImageBlock extends Block {
 	image: string = "https://placedog.net/400x200?r";
 	previewElement!: HTMLImageElement;
@@ -34,9 +38,10 @@ export class ImageBlock extends Block {
 		return `<div class="lpv-image"><img src="${this.image}" /></div>`;
     }
 
-	save(): BlockSaveData {
+	save(): BlockSaveData<ImageBlockSaveData> {
 		return {
 			type: "image",
+			id: this.id,
 			data: {
 				url: this.image,
 			},

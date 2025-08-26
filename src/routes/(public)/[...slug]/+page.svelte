@@ -1,7 +1,8 @@
 <script>
 	import PageRenderer from "$lib/components/PageRenderer.svelte";
 	let { data } = $props();
-	let { page } = $derived(data);
+	let { page, postBlockData } = $derived(data);
+	$inspect(postBlockData)
 </script>
 
 <svelte:head>
@@ -14,5 +15,5 @@
 </svelte:head>
 
 {#if page && data.page.content && data.page.page_settings}
-		<PageRenderer content={data.page.content} settings={data.page.page_settings}></PageRenderer>
+		<PageRenderer content={data.page.content} {postBlockData} settings={data.page.page_settings}></PageRenderer>
 {/if}
