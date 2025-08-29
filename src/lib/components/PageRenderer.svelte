@@ -2,7 +2,10 @@
 	import { componentMap } from "$lib/rendererComponents";
 	import {getPostData} from "$lib/rendererUtil";
 
-	let { content, settings, injectCSS = true, postBlockData = []}: {content: {content: any[], flex: boolean | null}, injectCSS?: boolean, settings: {
+	let { content, settings, injectCSS = true, postBlockData = []}: {
+		content: {content: any[], flex: boolean | null}, 
+		injectCSS?: boolean, 
+		settings: {
 		disable_navbar: boolean;
 		css: string;
 	}, postBlockData?: any[]} = $props();
@@ -11,7 +14,7 @@
 
 <svelte:head>
 	{#if injectCSS}
-	{@html "<style>" + settings.css + "</style>"}
+	{@html "<style>" + settings.css + "</style>"} <!----TODO: LINT THIS-->
 	{/if}
 </svelte:head>
 

@@ -14,6 +14,6 @@
 	<meta property="og:description" content={page.excerpt} />
 </svelte:head>
 
-{#if page && data.page.content && data.page.page_settings}
+{#if page && page.content && page.page_settings}
 		<PageRenderer content={data.page.content} {postBlockData} settings={data.page.page_settings}></PageRenderer>
 {/if}
