@@ -23,21 +23,21 @@ main.page-root {
     overflow: hidden;
     overflow-y: auto;
 }
-.blossom-page-root {
+.ancile-page-root {
     width: 100%;
 }
-.blossom-flex {
+.ancile-flex {
     align-items:start;
     display: flex;
     align-items: flex-start;
     align-content: flex-start;
     flex-wrap: wrap;
 }
-.blossom-image {
+.ancile-image {
     width: 100%;
     object-fit: cover;
 }
-.blossom-image img {
+.ancile-image img {
     width: 100%;
     height: 100%;
 }
@@ -68,7 +68,7 @@ main.page-root {
     height: 100%;
 }
 
-.blossom-page-root a {
+.ancile-page-root a {
     text-decoration: underline;
     color: var(--cardinal);
 }

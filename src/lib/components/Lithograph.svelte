@@ -33,7 +33,7 @@
 			blockTypes: [
 				TextBlock,
 				DividerBlock,
-				BlossomImageBlock,
+				AncileImageBlock,
 				ContainerBlock,
 				PostBlock,
 			],
@@ -46,7 +46,7 @@
 		return editor.getJSON();
 	}
 
-	export class BlossomImageBlock extends Block {
+	export class AncileImageBlock extends Block {
 		image: string = "https://placedog.net/400x200?r";
 		previewElement!: HTMLImageElement;
 		constructor(editor: Lithograph, parent: Block | null) {
@@ -105,7 +105,7 @@
 	}
 	let mediaLibraryOpen = $state(false);
 	let mediaSelectCallback = $state<Function | null>(null);
-	function openMediaLibrary(blockInstance: BlossomImageBlock) {
+	function openMediaLibrary(blockInstance: AncileImageBlock) {
 		mediaLibraryOpen = true;
 		mediaSelectCallback = (url: string, metadata_id: string) => {
 			blockInstance.onImageSelectedFromMediaLibrary(url, metadata_id);

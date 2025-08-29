@@ -22,5 +22,6 @@
 <form method="post" action="?/signout" use:enhance={handleSignOut}>
 	<div>
 		<button class="button block" disabled={loading}>Sign Out</button>
+		{session?.access_token}
 	</div>
 </form>

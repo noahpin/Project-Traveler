@@ -16,7 +16,7 @@
 </script>
 
 <div
-	class="blossom-container"
+	class="ancile-container"
 	style:width={`${(blockData.size.numerator / blockData.size.denominator) * 100}%`}
 >
 	{#if blockData}

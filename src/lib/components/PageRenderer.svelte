@@ -16,7 +16,7 @@
 </svelte:head>
 
 
-<div class={"blossom-page-root " + (content.flex ? "blossom-flex" : "")}>
+<div class={"ancile-page-root " + (content.flex ? "ancile-flex" : "")}>
 	{#if content}
 		{#each content.content as block}
 			{@const Block = componentMap[block.type]}

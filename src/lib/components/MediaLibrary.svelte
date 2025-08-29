@@ -62,6 +62,7 @@
 	async function updateMetadata() {
 		loading = true;
 		let filePath = selectedItem.file_path;
+		selectedItem.name = selectedItemName;
 		const { data, error } = await supabase
 			.from("files_metadata")
 			.update({
@@ -109,6 +110,7 @@
 	async function refresh() {
 		media = [];
 		page = 0;
+		selectedItem = null;
 		await loadMedia();
 	}
 </script>

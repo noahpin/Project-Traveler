@@ -21,6 +21,7 @@
 	import AdminTaxonomyInput from "$lib/components/AdminTaxonomyInput.svelte";
 	import MonacoEditor from "$lib/components/MonacoEditor.svelte";
 	import { fade } from "svelte/transition";
+	import MediaLibraryInput from "$lib/components/MediaLibraryInput.svelte";
 	let { data } = $props();
 	let { page: originalPageData, supabase } = $derived(data);
 	// svelte-ignore state_referenced_locally
@@ -476,19 +477,7 @@
 						</div>
 					{/if}
 					<div class="admin-editor-metadata-group">
-						<div class="admin-editor-metadata-label">Featured Image</div>
-						<button onclick={()=>mediaLibraryOpen=true} class="admin-editor-metadata-featured-image">
-							{#if page.featured_image && page.featured_image != ""}
-							<img
-								src={page.featured_image}
-								alt=""
-								class="admin-editor-metadata-featured-image-preview"
-							/>
-							{/if}
-								<div class="admin-editor-metadata-featured-image-button" class:admin-editor-metadata-featured-image-button-exist={page.featured_image != "" && page.featured_image != null}>
-									Select Image
-								</div>
-						</button>
+						<MediaLibraryInput bind:image={page.featured_image} {supabase} title="Featured Image" />
 					</div>
 				</div>
 			</div>

@@ -26,3 +26,5 @@ vite.config.ts.timestamp-*
 # Private
 /converter/*.xml
 /converter/*.csv
+
+/supabase/functions/service-account.json
